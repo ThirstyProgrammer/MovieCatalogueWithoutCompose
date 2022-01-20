@@ -2,7 +2,6 @@ package id.bachtiar.harits.moviecatalogue.ui.detail
 
 import android.os.Bundle
 import android.text.SpannableStringBuilder
-import android.util.DisplayMetrics
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.text.bold
@@ -56,9 +55,6 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
                     addItemDecoration(PaddingItemDecoration(ViewUtil.dpToPx(16), true))
                 }
             }
-            val displayMetrics = DisplayMetrics()
-            requireActivity().windowManager.defaultDisplay.getMetrics(displayMetrics)
-            castAdapter.setScreenSize(displayMetrics.widthPixels)
             castAdapter.setData(mViewModel.movie.cast ?: listOf())
             tvDescription.text = mViewModel.movie.description
             mViewModel.movie.category?.forEach {

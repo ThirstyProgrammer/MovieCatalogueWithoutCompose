@@ -10,7 +10,6 @@ import id.bachtiar.harits.moviecatalogue.model.Cast
 class CastAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val items : ArrayList<Cast> = arrayListOf()
-    private var screenSize: Int = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = ItemCastBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -19,7 +18,7 @@ class CastAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is CastViewHolder -> holder.bind(items[position], screenSize/2)
+            is CastViewHolder -> holder.bind(items[position])
             else -> Unit
         }
     }
@@ -31,9 +30,5 @@ class CastAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         items.clear()
         items.addAll(data)
         notifyDataSetChanged()
-    }
-
-    fun setScreenSize(widthPixels: Int) {
-        screenSize = widthPixels
     }
 }

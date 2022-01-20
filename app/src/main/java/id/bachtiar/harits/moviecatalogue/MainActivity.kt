@@ -1,10 +1,9 @@
 package id.bachtiar.harits.moviecatalogue
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.HiltAndroidApp
 import id.bachtiar.harits.moviecatalogue.databinding.ActivityMainBinding
 
 @AndroidEntryPoint
