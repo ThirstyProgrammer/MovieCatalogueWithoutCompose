@@ -1,4 +1,4 @@
-package id.bachtiar.harits.moviecatalogue.ui.list
+package id.bachtiar.harits.moviecatalogue.ui.movie
 
 import id.bachtiar.harits.moviecatalogue.model.Movie
 

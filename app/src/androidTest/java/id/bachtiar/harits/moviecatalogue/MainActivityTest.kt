@@ -9,9 +9,12 @@ import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
+import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.google.android.material.chip.Chip
+import id.bachtiar.harits.moviecatalogue.ui.tvshow.TvShowViewHolder
+import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.core.AllOf.allOf
 import org.hamcrest.core.StringContains.containsString
@@ -29,53 +32,43 @@ class MainActivityTest {
     }
 
     @Test
-    fun checkTabLayoutDisplayed() {
+    fun checkTabLayoutAndViewPagerDisplayed() {
         onView(withId(R.id.tab_layout))
-            .perform(click())
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.view_pager))
             .check(matches(isDisplayed()))
     }
 
     @Test
-    fun swipePage() {
+    fun checkSwipePageWorking() {
         onView(withId(R.id.view_pager))
             .perform(swipeLeft())
-        onView(allOf(withText("TV Show"), isDescendantOfA(withId(R.id.tab_layout))))
+        onView(withId(R.id.rv_tv_show))
             .check(matches(isDisplayed()))
         onView(withId(R.id.view_pager))
             .perform(swipeRight())
-        onView(allOf(withText("Movies"), isDescendantOfA(withId(R.id.tab_layout))))
+        onView(withId(R.id.rv_movie))
             .check(matches(isDisplayed()))
     }
 
     @Test
     fun checkTabTVShowJourney() {
-        onView(allOf(withText("TV Show"), isDescendantOfA(withId(R.id.tab_layout))))
+        onView(withId(R.id.view_pager))
+            .perform(swipeLeft())
+        onView(withId(R.id.rv_tv_show))
             .check(matches(isDisplayed()))
-            .perform(click())
-        onView(allOf(withId(R.id.rv_list), isDisplayed())).perform(ScrollToBottomAction())
-        onView(allOf(withText("Supernatural"), isDescendantOfA(withId(R.id.view_pager))))
-            .check(matches(isDisplayed()))
-            .perform(click())
+            .perform(actionOnItemAtPosition<TvShowViewHolder>(9, click()))
         checkDetailSupernatural()
-        onView(allOf(withText("TV Show"), isDescendantOfA(withId(R.id.tab_layout))))
-            .check(matches(isDisplayed()))
         onView(allOf(withText("Supernatural"), isDescendantOfA(withId(R.id.view_pager))))
             .check(matches(isDisplayed()))
     }
 
     @Test
     fun checkTabMovieJourney() {
-        onView(allOf(withText("Movies"), isDescendantOfA(withId(R.id.tab_layout))))
+        onView(withId(R.id.rv_movie))
             .check(matches(isDisplayed()))
-            .perform(click())
-        onView(allOf(withId(R.id.rv_list), isDisplayed()))
-            .perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(5, scrollTo()))
-        onView(allOf(withText("Wreck-It Ralph"), isDescendantOfA(withId(R.id.view_pager))))
-            .check(matches(isDisplayed()))
-            .perform(click())
+            .perform(actionOnItemAtPosition<TvShowViewHolder>(4, click()))
         checkDetailWreckItRalph()
-        onView(allOf(withText("Movies"), isDescendantOfA(withId(R.id.tab_layout))))
-            .check(matches(isDisplayed()))
         onView(allOf(withText("Wreck-It Ralph"), isDescendantOfA(withId(R.id.view_pager))))
             .check(matches(isDisplayed()))
     }
@@ -89,14 +82,12 @@ class MainActivityTest {
             .check(matches(withText("January 1, 2012")))
         onView(withId(R.id.tv_sub_desc))
             .check(matches(withText("Director :\nRick Moore\n\nScreenplay :\nPhil Johnston, Jennifer Lee\n\nStory :\nRick Moore, Jim Reardon")))
-        onView(allOf(withText("John C. Reilly"), isDescendantOfA(withId(R.id.rv_cast))))
+        onView(withId(R.id.rv_cast))
             .check(matches(isDisplayed()))
-        onView(allOf(withText("Wreck-It Ralph (voice)"), isDescendantOfA(withId(R.id.rv_cast))))
+        onView(hasItemAtPosition(0, hasDescendant(withText("John C. Reilly"))))
             .check(matches(isDisplayed()))
         onView(withId(R.id.rv_cast)).perform(ScrollToBottomAction())
-        onView(allOf(withText("Jess Harnell"), isDescendantOfA(withId(R.id.rv_cast))))
-            .check(matches(isDisplayed()))
-        onView(allOf(withText("Don (voice)"), isDescendantOfA(withId(R.id.rv_cast))))
+        onView(hasItemAtPosition(8, hasDescendant(withText("Jess Harnell"))))
             .check(matches(isDisplayed()))
         onView(withId(R.id.container_detail)).perform(swipeUp())
         chipContainsText("Family")
@@ -117,14 +108,12 @@ class MainActivityTest {
             .check(matches(withText("September 13, 2005")))
         onView(withId(R.id.tv_sub_desc))
             .check(matches(withText("Creator :\nEric Kripke")))
-        onView(allOf(withText("Jared Padalecki"), isDescendantOfA(withId(R.id.rv_cast))))
+        onView(withId(R.id.rv_cast))
             .check(matches(isDisplayed()))
-        onView(allOf(withText("Sam Winchester"), isDescendantOfA(withId(R.id.rv_cast))))
+        onView(hasItemAtPosition(0, hasDescendant(withText("Jared Padalecki"))))
             .check(matches(isDisplayed()))
         onView(withId(R.id.rv_cast)).perform(ScrollToBottomAction())
-        onView(allOf(withText("Samantha Smith"), isDescendantOfA(withId(R.id.rv_cast))))
-            .check(matches(isDisplayed()))
-        onView(allOf(withText("Mary Winchester"), isDescendantOfA(withId(R.id.rv_cast))))
+        onView(hasItemAtPosition(8, hasDescendant(withText("Samantha Smith"))))
             .check(matches(isDisplayed()))
         onView(withId(R.id.container_detail)).perform(swipeUp())
         chipContainsText("Drama")
@@ -138,6 +127,21 @@ class MainActivityTest {
 
     private fun chipContainsText(text: String) {
         onView(allOf(withText(containsString(text)), isAssignableFrom(Chip::class.java))).check(matches(isDisplayed()))
+    }
+
+    private fun hasItemAtPosition(position: Int, matcher: Matcher<View>) : Matcher<View> {
+        return object : BoundedMatcher<View, RecyclerView>(RecyclerView::class.java) {
+
+            override fun describeTo(description: Description?) {
+                description?.appendText("has item at position $position : ")
+                matcher.describeTo(description)
+            }
+
+            override fun matchesSafely(item: RecyclerView?): Boolean {
+                val viewHolder = item?.findViewHolderForAdapterPosition(position)
+                return matcher.matches(viewHolder?.itemView)
+            }
+        }
     }
 
     class ScrollToBottomAction : ViewAction {

@@ -1,4 +1,4 @@
-package id.bachtiar.harits.moviecatalogue.ui.list
+package id.bachtiar.harits.moviecatalogue.ui.tvshow
 
 import android.os.Bundle
 import android.view.View
@@ -10,27 +10,26 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import id.bachtiar.harits.moviecatalogue.R
-import id.bachtiar.harits.moviecatalogue.databinding.FragmentListBinding
-import id.bachtiar.harits.moviecatalogue.model.Category
-import id.bachtiar.harits.moviecatalogue.model.Movie
+import id.bachtiar.harits.moviecatalogue.databinding.FragmentTvShowBinding
+import id.bachtiar.harits.moviecatalogue.model.TvShow
 import id.bachtiar.harits.moviecatalogue.ui.main.MainFragmentDirections
 import id.bachtiar.harits.moviecatalogue.util.PaddingItemDecoration
 import id.bachtiar.harits.moviecatalogue.util.ViewUtil
 
 @AndroidEntryPoint
-class ListFragment : Fragment(R.layout.fragment_list), OnMovieClickCallback {
+class TvShowFragment : Fragment(R.layout.fragment_tv_show), OnTvShowClickCallback {
 
-    private val mAdapter = MovieAdapter()
-    private val binding: FragmentListBinding by viewBinding(FragmentListBinding::bind, R.id.container)
-    private val mViewModel: ListViewModel by viewModels()
+    private val mAdapter = TvShowAdapter()
+    private val binding: FragmentTvShowBinding by viewBinding(FragmentTvShowBinding::bind, R.id.container)
+    private val mViewModel: TvShowViewModel by viewModels()
 
     companion object {
-        private const val CATEGORY_DATA = "category_data"
+        private const val TV_SHOWS_DATA = "tv_shows_data"
 
-        fun newInstance(category: Category): ListFragment {
-            val fragment = ListFragment()
+        fun newInstance(tvShows: List<TvShow>): TvShowFragment {
+            val fragment = TvShowFragment()
             fragment.arguments = bundleOf(
-                CATEGORY_DATA to category
+                TV_SHOWS_DATA to tvShows
             )
             return fragment
         }
@@ -38,13 +37,13 @@ class ListFragment : Fragment(R.layout.fragment_list), OnMovieClickCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (requireArguments().containsKey(CATEGORY_DATA)) {
-            mViewModel.category = requireArguments().getParcelable(CATEGORY_DATA) ?: Category()
+        if (requireArguments().containsKey(TV_SHOWS_DATA)) {
+            mViewModel.tvShows.addAll((requireArguments().getParcelableArrayList<TvShow>(TV_SHOWS_DATA))?.toTypedArray() ?: emptyArray())
         }
     }
 
-    override fun onItemClicked(data: Movie) {
-        val direction = MainFragmentDirections.actionMainFragmentToDetailFragment(data)
+    override fun onItemClicked(data: TvShow) {
+        val direction = MainFragmentDirections.actionMainFragmentToDetailTvShowFragment(data)
         parentFragment?.findNavController()?.navigate(direction)
     }
 
@@ -57,7 +56,7 @@ class ListFragment : Fragment(R.layout.fragment_list), OnMovieClickCallback {
         binding.apply {
             val linearLayoutManager = LinearLayoutManager(requireContext())
 
-            rvList.apply {
+            rvTvShow.apply {
                 setHasFixedSize(true)
                 layoutManager = linearLayoutManager
                 adapter = mAdapter
@@ -67,6 +66,6 @@ class ListFragment : Fragment(R.layout.fragment_list), OnMovieClickCallback {
             }
         }
         mAdapter.setOnMovieClickCallback(this)
-        mAdapter.setData(mViewModel.category.value ?: listOf())
+        mAdapter.setData(mViewModel.tvShows)
     }
 }

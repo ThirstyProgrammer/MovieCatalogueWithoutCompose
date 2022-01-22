@@ -6,8 +6,7 @@ import id.bachtiar.harits.moviecatalogue.model.Movie
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailViewModel @Inject constructor() : ViewModel() {
+class DetailMovieViewModel @Inject constructor() : ViewModel() {
 
     var movie: Movie = Movie()
-
 }

@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 @Keep
 @Serializable
 data class Data(
-    val categories: List<Category>? = listOf(),
+    val movies: List<Movie>? = listOf(),
+    val tvShows: List<TvShow>? = listOf(),
 )

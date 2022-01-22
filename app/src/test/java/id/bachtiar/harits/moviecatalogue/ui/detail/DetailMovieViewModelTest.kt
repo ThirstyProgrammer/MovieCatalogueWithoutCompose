@@ -6,14 +6,14 @@ import org.junit.Before
 
 import org.junit.Test
 
-class DetailViewModelTest {
+class DetailMovieViewModelTest {
 
-    private lateinit var detailViewModel: DetailViewModel
+    private lateinit var detailMovieViewModel: DetailMovieViewModel
     private lateinit var movie: Movie
 
     @Before
     fun init() {
-        detailViewModel = DetailViewModel()
+        detailMovieViewModel = DetailMovieViewModel()
         movie = Movie(
             title = "Spiderman",
             cover = "url_cover",
@@ -26,12 +26,12 @@ class DetailViewModelTest {
 
     @Test
     fun getMovie() {
-        assertNotNull(detailViewModel.movie)
+        assertNotNull(detailMovieViewModel.movie)
     }
 
     @Test
     fun setMovie() {
-        detailViewModel.movie = movie
-        assertEquals(movie, detailViewModel.movie)
+        detailMovieViewModel.movie = movie
+        assertEquals(movie, detailMovieViewModel.movie)
     }
 }

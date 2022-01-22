@@ -10,11 +10,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import id.bachtiar.harits.moviecatalogue.R
 import id.bachtiar.harits.moviecatalogue.databinding.FragmentMainBinding
 import id.bachtiar.harits.moviecatalogue.model.Data
-import id.bachtiar.harits.moviecatalogue.ui.list.ListFragment
+import id.bachtiar.harits.moviecatalogue.ui.movie.MovieFragment
+import id.bachtiar.harits.moviecatalogue.ui.tvshow.TvShowFragment
 import id.bachtiar.harits.moviecatalogue.util.ViewPagerAdapter
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import java.util.ArrayList
+import java.util.*
 
 @AndroidEntryPoint
 class MainFragment : Fragment(R.layout.fragment_main) {
@@ -39,10 +40,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     private fun setupViewPager() {
         if (titlesViewPager.isEmpty()) {
-            mViewModel.data.categories?.forEach {
-                titlesViewPager.add(it.key.orEmpty())
-                fragmentsViewPager.add(ListFragment.newInstance(it))
-            }
+            titlesViewPager.add(getString(R.string.movies))
+            fragmentsViewPager.add(MovieFragment.newInstance(mViewModel.data.movies ?: listOf()))
+            titlesViewPager.add(getString(R.string.tv_shows))
+            fragmentsViewPager.add(TvShowFragment.newInstance(mViewModel.data.tvShows ?: listOf()))
         }
         val viewPagerAdapter = ViewPagerAdapter(childFragmentManager, lifecycle, fragmentsViewPager)
         binding.apply {

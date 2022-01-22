@@ -1,10 +1,9 @@
 package id.bachtiar.harits.moviecatalogue.ui.main
 
-import id.bachtiar.harits.moviecatalogue.model.Category
 import id.bachtiar.harits.moviecatalogue.model.Data
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
-
 import org.junit.Test
 
 class MainViewModelTest {
@@ -16,10 +15,8 @@ class MainViewModelTest {
     fun init() {
         mainViewModel = MainViewModel()
         data = Data(
-            listOf(
-                Category("Movie", listOf()),
-                Category("TV Show", listOf()),
-            )
+            movies = listOf(),
+            tvShows = listOf()
         )
     }
 
