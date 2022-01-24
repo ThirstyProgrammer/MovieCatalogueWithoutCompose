@@ -31,7 +31,7 @@ class DetailMovieViewModelTest {
 
     @Test
     fun getMovie() {
-        detailMovieViewModel.movie = Movie()
+        detailMovieViewModel.movie = movie
         assertNotNull(detailMovieViewModel.movie)
         assertEquals(detailMovieViewModel.movie.title, movie.title)
         assertEquals(detailMovieViewModel.movie.cover, movie.cover)
