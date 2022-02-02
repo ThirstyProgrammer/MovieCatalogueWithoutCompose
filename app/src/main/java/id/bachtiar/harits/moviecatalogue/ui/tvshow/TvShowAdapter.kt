@@ -1,16 +1,14 @@
 package id.bachtiar.harits.moviecatalogue.ui.tvshow
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import id.bachtiar.harits.moviecatalogue.databinding.ItemTvShowBinding
-import id.bachtiar.harits.moviecatalogue.model.TvShow
+import id.bachtiar.harits.moviecatalogue.model.TvShows
 
-class TvShowAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class TvShowAdapter constructor(private val items: List<TvShows.Data>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private lateinit var listener: OnTvShowClickCallback
-    private val items = ArrayList<TvShow>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = ItemTvShowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -30,12 +28,5 @@ class TvShowAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     fun setOnMovieClickCallback(onTvShowClickCallback: OnTvShowClickCallback) {
         this.listener = onTvShowClickCallback
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun setData(data: List<TvShow>) {
-        items.clear()
-        items.addAll(data)
-        notifyDataSetChanged()
     }
 }

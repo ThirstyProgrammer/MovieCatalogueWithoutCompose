@@ -10,4 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:listitem="@layout/item_movie" />
+
+    <include
+        android:id="@+id/view_state"
+        layout="@layout/view_state"
+        android:visibility="gone" />
 </androidx.constraintlayout.widget.ConstraintLayout>

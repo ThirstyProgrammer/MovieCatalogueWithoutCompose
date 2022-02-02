@@ -3,34 +3,21 @@ package id.bachtiar.harits.moviecatalogue.ui.main
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import id.bachtiar.harits.moviecatalogue.R
 import id.bachtiar.harits.moviecatalogue.databinding.FragmentMainBinding
-import id.bachtiar.harits.moviecatalogue.model.Data
 import id.bachtiar.harits.moviecatalogue.ui.movie.MovieFragment
 import id.bachtiar.harits.moviecatalogue.ui.tvshow.TvShowFragment
 import id.bachtiar.harits.moviecatalogue.util.ViewPagerAdapter
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import java.util.*
 
 @AndroidEntryPoint
 class MainFragment : Fragment(R.layout.fragment_main) {
 
     private val binding: FragmentMainBinding by viewBinding(FragmentMainBinding::bind, R.id.container)
-    private val mViewModel: MainViewModel by viewModels()
-    private val json = Json { ignoreUnknownKeys = true }
-
     private val titlesViewPager: ArrayList<String> = arrayListOf()
     private val fragmentsViewPager: ArrayList<Fragment> = arrayListOf()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mViewModel.data = getData()
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -41,9 +28,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private fun setupViewPager() {
         if (titlesViewPager.isEmpty()) {
             titlesViewPager.add(getString(R.string.movies))
-            fragmentsViewPager.add(MovieFragment.newInstance(mViewModel.data.movies ?: listOf()))
+            fragmentsViewPager.add(MovieFragment())
             titlesViewPager.add(getString(R.string.tv_shows))
-            fragmentsViewPager.add(TvShowFragment.newInstance(mViewModel.data.tvShows ?: listOf()))
+            fragmentsViewPager.add(TvShowFragment())
         }
         val viewPagerAdapter = ViewPagerAdapter(childFragmentManager, lifecycle, fragmentsViewPager)
         binding.apply {
@@ -58,10 +45,5 @@ class MainFragment : Fragment(R.layout.fragment_main) {
                 tab.text = titlesViewPager[position]
             }.attach()
         }
-    }
-
-    private fun getData(): Data {
-        val jsonString = requireActivity().assets.open("moviecatalogue.json").bufferedReader().use { it.readText() }
-        return json.decodeFromString(jsonString)
     }
 }

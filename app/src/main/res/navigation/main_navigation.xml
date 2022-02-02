@@ -18,18 +18,18 @@
 
     <fragment
         android:id="@+id/detailMovieFragment"
-        android:name="id.bachtiar.harits.moviecatalogue.ui.detail.DetailMovieFragment"
+        android:name="id.bachtiar.harits.moviecatalogue.ui.movie.detail.DetailMovieFragment"
         android:label="DetailFragment">
         <argument
-            android:name="movie"
-            app:argType="id.bachtiar.harits.moviecatalogue.model.Movie" />
+            android:name="id"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/detailTvShowFragment"
-        android:name="id.bachtiar.harits.moviecatalogue.ui.detail.DetailTvShowFragment"
+        android:name="id.bachtiar.harits.moviecatalogue.ui.tvshow.detail.DetailTvShowFragment"
         android:label="DetailTvShowFragment" >
         <argument
-            android:name="tvShow"
-            app:argType="id.bachtiar.harits.moviecatalogue.model.TvShow" />
+            android:name="id"
+            app:argType="integer" />
     </fragment>
 </navigation>

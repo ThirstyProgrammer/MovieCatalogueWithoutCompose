@@ -1,16 +1,14 @@
 package id.bachtiar.harits.moviecatalogue.ui.movie
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import id.bachtiar.harits.moviecatalogue.databinding.ItemMovieBinding
-import id.bachtiar.harits.moviecatalogue.model.Movie
+import id.bachtiar.harits.moviecatalogue.model.Movies
 
-class MovieAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MovieAdapter constructor(private val items: List<Movies.Data>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private lateinit var listener: OnMovieClickCallback
-    private val items = ArrayList<Movie>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val binding = ItemMovieBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -30,12 +28,5 @@ class MovieAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     fun setOnMovieClickCallback(onMovieClickCallback: OnMovieClickCallback) {
         this.listener = onMovieClickCallback
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun setData(data: List<Movie>) {
-        items.clear()
-        items.addAll(data)
-        notifyDataSetChanged()
     }
 }
