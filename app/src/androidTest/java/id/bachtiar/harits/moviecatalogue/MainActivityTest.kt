@@ -4,6 +4,7 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.*
@@ -14,10 +15,12 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.google.android.material.chip.Chip
 import id.bachtiar.harits.moviecatalogue.ui.tvshow.TvShowViewHolder
+import id.bachtiar.harits.moviecatalogue.util.EspressoIdlingResource
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.core.AllOf.allOf
 import org.hamcrest.core.StringContains.containsString
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,6 +32,12 @@ class MainActivityTest {
     @Before
     fun setup() {
         ActivityScenario.launch(MainActivity::class.java)
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.idlingResource)
+    }
+
+    @After
+    fun tearDown() {
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.idlingResource)
     }
 
     @Test
@@ -57,9 +66,9 @@ class MainActivityTest {
             .perform(swipeLeft())
         onView(withId(R.id.rv_tv_show))
             .check(matches(isDisplayed()))
-            .perform(actionOnItemAtPosition<TvShowViewHolder>(9, click()))
-        checkDetailSupernatural()
-        onView(allOf(withText("Supernatural"), isDescendantOfA(withId(R.id.view_pager))))
+            .perform(actionOnItemAtPosition<TvShowViewHolder>(11, click()))
+        checkDetailTvShow()
+        onView(allOf(withText("Peaky Blinders"), isDescendantOfA(withId(R.id.view_pager))))
             .check(matches(isDisplayed()))
     }
 
@@ -68,60 +77,51 @@ class MainActivityTest {
         onView(withId(R.id.rv_movie))
             .check(matches(isDisplayed()))
             .perform(actionOnItemAtPosition<TvShowViewHolder>(4, click()))
-        checkDetailWreckItRalph()
-        onView(allOf(withText("Wreck-It Ralph"), isDescendantOfA(withId(R.id.view_pager))))
+        checkDetailMovie()
+        onView(allOf(withText("Sing 2"), isDescendantOfA(withId(R.id.view_pager))))
             .check(matches(isDisplayed()))
     }
 
-    private fun checkDetailWreckItRalph() {
+    private fun checkDetailMovie() {
         onView(withId(R.id.tv_progress))
-            .check(matches(withText("73")))
+            .check(matches(withText("8.3")))
         onView(withId(R.id.tv_total_user_rating))
-            .check(matches(withText("10.324 Ratings")))
+            .check(matches(withText("1.570 Ratings")))
         onView(withId(R.id.tv_release_date))
-            .check(matches(withText("January 1, 2012")))
+            .check(matches(withText("December 01, 2021")))
         onView(withId(R.id.tv_sub_desc))
-            .check(matches(withText("Director :\nRick Moore\n\nScreenplay :\nPhil Johnston, Jennifer Lee\n\nStory :\nRick Moore, Jim Reardon")))
-        onView(withId(R.id.rv_cast))
-            .check(matches(isDisplayed()))
-        onView(hasItemAtPosition(0, hasDescendant(withText("John C. Reilly"))))
-            .check(matches(isDisplayed()))
-        onView(withId(R.id.rv_cast)).perform(ScrollToBottomAction())
-        onView(hasItemAtPosition(8, hasDescendant(withText("Jess Harnell"))))
-            .check(matches(isDisplayed()))
+            .check(matches(withText("Production Company :\nIllumination Entertainment, Universal Pictures")))
         onView(withId(R.id.container_detail)).perform(swipeUp())
-        chipContainsText("Family")
-        chipContainsText("Animation")
         chipContainsText("Comedy")
-        chipContainsText("Adventure")
+        chipContainsText("Animation")
+        chipContainsText("Family")
+        chipContainsText("Music")
         onView(withId(R.id.tv_description))
-            .check(matches(withText("Wreck-It Ralph is the 9-foot-tall, 643-pound villain of an arcade video game named Fix-It Felix Jr., in which the game's titular hero fixes buildings that Ralph destroys. Wanting to prove he can be a good guy and not just a villain, Ralph escapes his game and lands in Hero's Duty, a first-person shooter where he helps the game's hero battle against alien invaders. He later enters Sugar Rush, a kart racing game set on tracks made of candies, cookies and other sweets. There, Ralph meets Vanellope von Schweetz who has learned that her game is faced with a dire threat that could affect the entire arcade, and one that Ralph may have inadvertently started.")))
+            .check(matches(withText("Buster and his new cast now have their sights set on debuting a new show at the Crystal Tower Theater in glamorous Redshore City. But with no connections, he and his singers must sneak into the Crystal Entertainment offices, run by the ruthless wolf mogul Jimmy Crystal, where the gang pitches the ridiculous idea of casting the lion rock legend Clay Calloway in their show. Buster must embark on a quest to find the now-isolated Clay and persuade him to return to the stage.")))
         onView(isRoot()).perform(pressBack())
     }
 
-    private fun checkDetailSupernatural() {
+    private fun checkDetailTvShow() {
         onView(withId(R.id.tv_progress))
-            .check(matches(withText("82")))
+            .check(matches(withText("8.6")))
         onView(withId(R.id.tv_total_user_rating))
-            .check(matches(withText("5.645 Ratings")))
+            .check(matches(withText("5.112 Ratings")))
         onView(withId(R.id.tv_release_date))
-            .check(matches(withText("September 13, 2005")))
+            .check(matches(withText("September 12, 2013")))
         onView(withId(R.id.tv_sub_desc))
-            .check(matches(withText("Creator :\nEric Kripke")))
-        onView(withId(R.id.rv_cast))
+            .check(matches(withText("Production Company :\nTiger Aspect Productions, BBC Studios, Caryn Mandabach Productions, Screen Yorkshire")))
+        onView(withId(R.id.rv_seasons))
             .check(matches(isDisplayed()))
-        onView(hasItemAtPosition(0, hasDescendant(withText("Jared Padalecki"))))
+        onView(hasItemAtPosition(0, hasDescendant(withText("Specials"))))
             .check(matches(isDisplayed()))
-        onView(withId(R.id.rv_cast)).perform(ScrollToBottomAction())
-        onView(hasItemAtPosition(8, hasDescendant(withText("Samantha Smith"))))
+        onView(withId(R.id.rv_seasons)).perform(ScrollToBottomAction())
+        onView(hasItemAtPosition(6, hasDescendant(withText("Series 6"))))
             .check(matches(isDisplayed()))
         onView(withId(R.id.container_detail)).perform(swipeUp())
         chipContainsText("Drama")
-        chipContainsText("Mystery")
-        chipContainsText("Science Fiction")
-        chipContainsText("Fantasy")
+        chipContainsText("Crime")
         onView(withId(R.id.tv_description))
-            .check(matches(withText("When they were boys, Sam and Dean Winchester lost their mother to a mysterious and demonic supernatural force. Subsequently, their father raised them to be soldiers. He taught them about the paranormal evil that lives in the dark corners and on the back roads of America ... and he taught them how to kill it. Now, the Winchester brothers crisscross the country in their '67 Chevy Impala, battling every kind of supernatural threat they encounter along the way.")))
+            .check(matches(withText("A gangster family epic set in 1919 Birmingham, England and centered on a gang who sew razor blades in the peaks of their caps, and their fierce boss Tommy Shelby, who means to move up in the world.")))
         onView(isRoot()).perform(pressBack())
     }
 

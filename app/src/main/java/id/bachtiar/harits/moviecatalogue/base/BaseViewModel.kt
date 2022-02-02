@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.bachtiar.harits.moviecatalogue.network.ViewState
+import id.bachtiar.harits.moviecatalogue.util.EspressoIdlingResource
 import id.bachtiar.harits.moviecatalogue.util.Event
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,6 +26,7 @@ abstract class BaseViewModel : ViewModel() {
         viewStateActive: Boolean = true,
         apiMethod: suspend () -> T
     ) {
+        EspressoIdlingResource.increment()
         viewModelScope.launch {
             if (viewStateActive) _viewState.postValue(ViewState.LOADING)
             withContext(Dispatchers.IO) {
@@ -32,9 +34,11 @@ abstract class BaseViewModel : ViewModel() {
                     val result = apiMethod()
                     data.postValue(result)
                     if (viewStateActive) _viewState.postValue(ViewState.SUCCESS)
+                    EspressoIdlingResource.decrement()
                 } catch (throwable: Throwable) {
                     handleNetworkError(throwable)
                     if (viewStateActive) _viewState.postValue(ViewState.ERROR)
+                    EspressoIdlingResource.decrement()
                 }
             }
         }

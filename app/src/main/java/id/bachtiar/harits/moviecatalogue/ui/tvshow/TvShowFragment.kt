@@ -21,6 +21,7 @@ class TvShowFragment : Fragment(R.layout.fragment_tv_show), OnTvShowClickCallbac
     private val binding: FragmentTvShowBinding by viewBinding(FragmentTvShowBinding::bind, R.id.container)
     private val mViewModel: TvShowViewModel by viewModels()
     private var isLoading: Boolean = false
+    private var isFirstHit: Boolean = true
 
     override fun onItemClicked(data: TvShows.Data) {
         val direction = MainFragmentDirections.actionMainFragmentToDetailTvShowFragment(data.id ?: 0)
@@ -31,7 +32,10 @@ class TvShowFragment : Fragment(R.layout.fragment_tv_show), OnTvShowClickCallbac
         super.onViewCreated(view, savedInstanceState)
         setupView()
         handleViewModelObserver()
-        mViewModel.getPopularTvShows()
+        if (isFirstHit) {
+            mViewModel.getPopularTvShows()
+            isFirstHit = false
+        }
     }
 
     private fun handleViewModelObserver() {

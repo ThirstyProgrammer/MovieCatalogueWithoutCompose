@@ -21,6 +21,7 @@ class MovieFragment : Fragment(R.layout.fragment_movie), OnMovieClickCallback {
     private val binding: FragmentMovieBinding by viewBinding(FragmentMovieBinding::bind, R.id.container)
     private val mViewModel: MovieViewModel by viewModels()
     private var isLoading: Boolean = false
+    private var isFirstHit: Boolean = true
 
     override fun onItemClicked(data: Movies.Data) {
         val direction = MainFragmentDirections.actionMainFragmentToDetailMovieFragment(data.id ?: 0)
@@ -31,7 +32,10 @@ class MovieFragment : Fragment(R.layout.fragment_movie), OnMovieClickCallback {
         super.onViewCreated(view, savedInstanceState)
         setupView()
         handleViewModelObserver()
-        mViewModel.getPopularMovies()
+        if (isFirstHit){
+            mViewModel.getPopularMovies()
+            isFirstHit = false
+        }
     }
 
     private fun setupView() {
