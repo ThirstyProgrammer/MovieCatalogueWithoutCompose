@@ -4,8 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import id.bachtiar.harits.moviecatalogue.network.ApiService
-import id.bachtiar.harits.moviecatalogue.repository.MovieCatalogueRepository
+import id.bachtiar.harits.moviecatalogue.data.MovieCatalogueRepository
+import id.bachtiar.harits.moviecatalogue.data.remote.RemoteDataSource
 import kotlinx.serialization.ExperimentalSerializationApi
 import javax.inject.Singleton
 
@@ -18,7 +18,7 @@ class AppModule {
     @ExperimentalSerializationApi
     @Singleton
     @Provides
-    fun provideRepository(
-        apiService: ApiService
-    ) = MovieCatalogueRepository(apiService)
+    fun provideRepository2(
+        remoteDataSource: RemoteDataSource
+    ) = MovieCatalogueRepository(remoteDataSource)
 }

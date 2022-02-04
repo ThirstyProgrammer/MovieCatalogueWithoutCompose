@@ -12,7 +12,10 @@ import id.bachtiar.harits.moviecatalogue.R
 import id.bachtiar.harits.moviecatalogue.databinding.FragmentTvShowBinding
 import id.bachtiar.harits.moviecatalogue.model.TvShows
 import id.bachtiar.harits.moviecatalogue.ui.main.MainFragmentDirections
-import id.bachtiar.harits.moviecatalogue.util.*
+import id.bachtiar.harits.moviecatalogue.util.PaddingItemDecoration
+import id.bachtiar.harits.moviecatalogue.util.ViewUtil
+import id.bachtiar.harits.moviecatalogue.util.handleViewState
+import id.bachtiar.harits.moviecatalogue.util.setOnRetakeClicked
 
 @AndroidEntryPoint
 class TvShowFragment : Fragment(R.layout.fragment_tv_show), OnTvShowClickCallback {
@@ -20,8 +23,6 @@ class TvShowFragment : Fragment(R.layout.fragment_tv_show), OnTvShowClickCallbac
     private lateinit var mAdapter : TvShowAdapter
     private val binding: FragmentTvShowBinding by viewBinding(FragmentTvShowBinding::bind, R.id.container)
     private val mViewModel: TvShowViewModel by viewModels()
-    private var isLoading: Boolean = false
-    private var isFirstHit: Boolean = true
 
     override fun onItemClicked(data: TvShows.Data) {
         val direction = MainFragmentDirections.actionMainFragmentToDetailTvShowFragment(data.id ?: 0)
@@ -32,26 +33,15 @@ class TvShowFragment : Fragment(R.layout.fragment_tv_show), OnTvShowClickCallbac
         super.onViewCreated(view, savedInstanceState)
         setupView()
         handleViewModelObserver()
-        if (isFirstHit) {
-            mViewModel.getPopularTvShows()
-            isFirstHit = false
-        }
     }
 
     private fun handleViewModelObserver() {
-        mViewModel.response.observe(viewLifecycleOwner) {
-            isLoading = false
-            mAdapter = TvShowAdapter(it.results ?: listOf())
-            mAdapter.setOnMovieClickCallback(this)
-            binding.rvTvShow.adapter = mAdapter
-        }
-        mViewModel.viewState.observe(viewLifecycleOwner) {
-            if (!isLoading) binding.viewState.handleViewState(it)
-        }
-
-        mViewModel.error.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let { errorMsg ->
-                if (!isLoading) binding.viewState.setErrorMessage(errorMsg)
+        mViewModel.getPopularTvShows().observe(viewLifecycleOwner) {
+            binding.viewState.handleViewState(it.status, it.message.orEmpty())
+            if (it.data != null) {
+                mAdapter = TvShowAdapter(it.data.results ?: listOf())
+                mAdapter.setOnMovieClickCallback(this)
+                binding.rvTvShow.adapter = mAdapter
             }
         }
     }

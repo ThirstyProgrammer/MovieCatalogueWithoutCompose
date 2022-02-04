@@ -17,6 +17,7 @@ android {
         targetSdk 32
         versionCode 1
         versionName "1.0"
+        buildConfigField("String", "API_KEY", '"3cfebc632cc9b161eef6e6f23409809a"')
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

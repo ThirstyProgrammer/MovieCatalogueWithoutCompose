@@ -12,7 +12,10 @@ import id.bachtiar.harits.moviecatalogue.R
 import id.bachtiar.harits.moviecatalogue.databinding.FragmentMovieBinding
 import id.bachtiar.harits.moviecatalogue.model.Movies
 import id.bachtiar.harits.moviecatalogue.ui.main.MainFragmentDirections
-import id.bachtiar.harits.moviecatalogue.util.*
+import id.bachtiar.harits.moviecatalogue.util.PaddingItemDecoration
+import id.bachtiar.harits.moviecatalogue.util.ViewUtil
+import id.bachtiar.harits.moviecatalogue.util.handleViewState
+import id.bachtiar.harits.moviecatalogue.util.setOnRetakeClicked
 
 @AndroidEntryPoint
 class MovieFragment : Fragment(R.layout.fragment_movie), OnMovieClickCallback {
@@ -20,8 +23,6 @@ class MovieFragment : Fragment(R.layout.fragment_movie), OnMovieClickCallback {
     private lateinit var mAdapter: MovieAdapter
     private val binding: FragmentMovieBinding by viewBinding(FragmentMovieBinding::bind, R.id.container)
     private val mViewModel: MovieViewModel by viewModels()
-    private var isLoading: Boolean = false
-    private var isFirstHit: Boolean = true
 
     override fun onItemClicked(data: Movies.Data) {
         val direction = MainFragmentDirections.actionMainFragmentToDetailMovieFragment(data.id ?: 0)
@@ -32,10 +33,6 @@ class MovieFragment : Fragment(R.layout.fragment_movie), OnMovieClickCallback {
         super.onViewCreated(view, savedInstanceState)
         setupView()
         handleViewModelObserver()
-        if (isFirstHit){
-            mViewModel.getPopularMovies()
-            isFirstHit = false
-        }
     }
 
     private fun setupView() {
@@ -53,19 +50,12 @@ class MovieFragment : Fragment(R.layout.fragment_movie), OnMovieClickCallback {
     }
 
     private fun handleViewModelObserver() {
-        mViewModel.response.observe(viewLifecycleOwner) {
-            isLoading = false
-            mAdapter = MovieAdapter(it.results ?: listOf())
-            mAdapter.setOnMovieClickCallback(this)
-            binding.rvMovie.adapter = mAdapter
-        }
-        mViewModel.viewState.observe(viewLifecycleOwner) {
-            if (!isLoading) binding.viewState.handleViewState(it)
-        }
-
-        mViewModel.error.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let { errorMsg ->
-                if (!isLoading) binding.viewState.setErrorMessage(errorMsg)
+        mViewModel.getPopularMovies().observe(viewLifecycleOwner) {
+            binding.viewState.handleViewState(it.status, it.message.orEmpty())
+            if (it.data != null) {
+                mAdapter = MovieAdapter(it.data.results ?: listOf())
+                mAdapter.setOnMovieClickCallback(this)
+                binding.rvMovie.adapter = mAdapter
             }
         }
     }

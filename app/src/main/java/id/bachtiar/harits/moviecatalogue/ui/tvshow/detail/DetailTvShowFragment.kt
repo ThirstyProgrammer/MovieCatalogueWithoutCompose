@@ -31,21 +31,14 @@ class DetailTvShowFragment : Fragment(R.layout.fragment_detail_tv_show) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleViewModelObserver()
-        mTvShowViewModel.getTvShow(args.id)
         binding.viewState.setOnRetakeClicked { mTvShowViewModel.getTvShow(args.id) }
     }
 
     private fun handleViewModelObserver() {
-        mTvShowViewModel.response.observe(viewLifecycleOwner) {
-            setupView(it)
-        }
-        mTvShowViewModel.viewState.observe(viewLifecycleOwner) {
-            binding.viewState.handleViewState(it)
-        }
-
-        mTvShowViewModel.error.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let { errorMsg ->
-                binding.viewState.setErrorMessage(errorMsg)
+        mTvShowViewModel.getTvShow(args.id).observe(viewLifecycleOwner) {
+            binding.viewState.handleViewState(it.status, it.message.orEmpty())
+            if (it.data != null) {
+                setupView(it.data)
             }
         }
     }

@@ -1,4 +1,4 @@
-package id.bachtiar.harits.moviecatalogue.network
+package id.bachtiar.harits.moviecatalogue.data
 
 enum class ViewState {
     LOADING,

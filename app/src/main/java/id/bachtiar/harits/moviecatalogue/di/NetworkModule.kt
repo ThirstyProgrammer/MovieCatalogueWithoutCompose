@@ -10,6 +10,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import id.bachtiar.harits.moviecatalogue.BuildConfig
+import id.bachtiar.harits.moviecatalogue.data.remote.RemoteDataSource
 import id.bachtiar.harits.moviecatalogue.network.ApiService
 import id.bachtiar.harits.moviecatalogue.util.Constant
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -79,5 +80,11 @@ object NetworkModule {
             .maxContentLength(250_000L)
             .alwaysReadResponseBody(true)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRemoteDataSource(apiService: ApiService): RemoteDataSource {
+        return RemoteDataSource(apiService)
     }
 }

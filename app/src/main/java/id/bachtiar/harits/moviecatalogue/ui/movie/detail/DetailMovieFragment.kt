@@ -29,21 +29,14 @@ class DetailMovieFragment : Fragment(R.layout.fragment_detail_movie) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         handleViewModelObserver()
-        mMovieViewModel.getMovie(args.id)
         binding.viewState.setOnRetakeClicked { mMovieViewModel.getMovie(args.id) }
     }
 
     private fun handleViewModelObserver() {
-        mMovieViewModel.response.observe(viewLifecycleOwner) {
-            setupView(it)
-        }
-        mMovieViewModel.viewState.observe(viewLifecycleOwner) {
-            binding.viewState.handleViewState(it)
-        }
-
-        mMovieViewModel.error.observe(viewLifecycleOwner) {
-            it.getContentIfNotHandled()?.let { errorMsg ->
-                binding.viewState.setErrorMessage(errorMsg)
+        mMovieViewModel.getMovie(args.id).observe(viewLifecycleOwner) {
+            binding.viewState.handleViewState(it.status, it.message.orEmpty())
+            if (it.data != null) {
+                setupView(it.data)
             }
         }
     }
@@ -60,15 +53,6 @@ class DetailMovieFragment : Fragment(R.layout.fragment_detail_movie) {
             tvTotalUserRating.text = getRating(data.totalUserRating ?: 0)
             tvReleaseDate.text = StringHelper.getDateForView(data.releaseDate)
             tvSubDesc.text = getSubDesc(data.productionCompanies ?: listOf())
-//            rvCast.apply {
-//                setHasFixedSize(true)
-//                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-//                adapter = castAdapter
-//                if (itemDecorationCount == 0) {
-//                    addItemDecoration(PaddingItemDecoration(ViewUtil.dpToPx(16), true))
-//                }
-//            }
-//            castAdapter.setData(data.cast ?: listOf())
             tvDescription.text = data.overview
             data.genres?.forEach {
                 val chip = Chip(requireContext())
