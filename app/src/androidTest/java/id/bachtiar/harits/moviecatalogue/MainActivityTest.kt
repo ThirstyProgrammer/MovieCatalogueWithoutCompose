@@ -9,11 +9,12 @@ import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
+import androidx.test.espresso.contrib.RecyclerViewActions.scrollTo
 import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.google.android.material.chip.Chip
+import id.bachtiar.harits.moviecatalogue.ui.movie.MovieViewHolder
 import id.bachtiar.harits.moviecatalogue.ui.tvshow.TvShowViewHolder
 import id.bachtiar.harits.moviecatalogue.util.EspressoIdlingResource
 import org.hamcrest.Description
@@ -66,7 +67,9 @@ class MainActivityTest {
             .perform(swipeLeft())
         onView(withId(R.id.rv_tv_show))
             .check(matches(isDisplayed()))
-            .perform(actionOnItemAtPosition<TvShowViewHolder>(13, click()))
+            .perform(scrollTo<TvShowViewHolder>(hasDescendant(withText("Peaky Blinders"))))
+        onView(allOf(withText("Peaky Blinders"), isDescendantOfA(withId(R.id.item_tv_show))))
+            .perform(click())
         checkDetailTvShow()
         onView(allOf(withText("Peaky Blinders"), isDescendantOfA(withId(R.id.view_pager))))
             .check(matches(isDisplayed()))
@@ -76,7 +79,9 @@ class MainActivityTest {
     fun checkTabMovieJourney() {
         onView(withId(R.id.rv_movie))
             .check(matches(isDisplayed()))
-            .perform(actionOnItemAtPosition<TvShowViewHolder>(4, click()))
+            .perform(scrollTo<MovieViewHolder>(hasDescendant(withText("Sing 2"))))
+        onView(allOf(withText("Sing 2"), isDescendantOfA(withId(R.id.item_movie))))
+            .perform(click())
         checkDetailMovie()
         onView(allOf(withText("Sing 2"), isDescendantOfA(withId(R.id.view_pager))))
             .check(matches(isDisplayed()))
