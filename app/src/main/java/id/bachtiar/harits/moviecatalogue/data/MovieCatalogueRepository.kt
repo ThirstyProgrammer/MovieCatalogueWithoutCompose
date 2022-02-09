@@ -54,9 +54,11 @@ class MovieCatalogueRepository @Inject constructor(
         }.asLiveData()
     }
 
-    override suspend fun updateFavoriteMovie(movie: MoviesEntity) {
-        movie.isFavourite = !movie.isFavourite
-        localDataSource.updateMovies(movie)
+    override fun updateFavoriteMovie(movie: MoviesEntity) {
+        appExecutors.diskIO().execute {
+            movie.isFavourite = !movie.isFavourite
+            localDataSource.updateMovies(movie)
+        }
     }
 
     override fun getPopularTvShows(page: Int, query: String, isFavorite: Boolean): LiveData<DataResult<PagedList<TvShowsEntity>>> {
@@ -91,9 +93,11 @@ class MovieCatalogueRepository @Inject constructor(
         }.asLiveData()
     }
 
-    override suspend fun updateFavoriteTvShows(tvShow: TvShowsEntity) {
-        tvShow.isFavourite = !tvShow.isFavourite
-        localDataSource.updateTvShows(tvShow)
+    override fun updateFavoriteTvShows(tvShow: TvShowsEntity) {
+        appExecutors.diskIO().execute {
+            tvShow.isFavourite = !tvShow.isFavourite
+            localDataSource.updateTvShows(tvShow)
+        }
     }
 
     override fun getMovie(id: Int): LiveData<DataResult<MovieEntity>> {

@@ -3,11 +3,13 @@ package id.bachtiar.harits.moviecatalogue.ui.movie
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.paging.PagedList
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import id.bachtiar.harits.moviecatalogue.data.DataResult
 import id.bachtiar.harits.moviecatalogue.data.MovieCatalogueRepository
-import id.bachtiar.harits.moviecatalogue.model.Movies
+import id.bachtiar.harits.moviecatalogue.data.local.entity.MoviesEntity
 import id.bachtiar.harits.moviecatalogue.util.DataDummy
 import id.bachtiar.harits.moviecatalogue.utils.getOrAwaitValueTest
 import org.junit.Assert.assertEquals
@@ -31,29 +33,41 @@ class MovieViewModelTest {
     val mockitoRule: MockitoRule = MockitoJUnit.rule()
 
     private lateinit var viewModel: MovieViewModel
-    private lateinit var dummyResponse: DataResult<Movies.Response>
+
     private val movieCatalogueRepository: MovieCatalogueRepository = mock()
-    private var observer: Observer<DataResult<Movies.Response>> = mock()
+    private var observer: Observer<DataResult<PagedList<MoviesEntity>>> = mock()
+    private var pagedList: PagedList<MoviesEntity> = mock()
 
     @Before
     fun setUp() {
         viewModel = MovieViewModel(movieCatalogueRepository)
-        dummyResponse = DataDummy.getMovies()
     }
 
     @Test
     fun getPopularMovies() {
-        val moviesResponse = MutableLiveData<DataResult<Movies.Response>>()
-        moviesResponse.value = dummyResponse
-        `when`(movieCatalogueRepository.getPopularMovies(1)).thenReturn(moviesResponse)
-        val response = viewModel.getPopularMovies().getOrAwaitValueTest()
-        verify(movieCatalogueRepository).getPopularMovies(1)
-        assertNotNull(response)
-        assertEquals(moviesResponse.value?.status, response.status)
-        assertEquals(moviesResponse.value?.message, response.message)
-        assertEquals(moviesResponse.value?.data, response.data)
+        val queryAndFavorite = Pair("", false)
+        val moviesDatabase = DataResult.success(pagedList)
+        `when`(moviesDatabase.data?.size).thenReturn(5)
+        val moviesResponse = MutableLiveData<DataResult<PagedList<MoviesEntity>>>()
+        moviesResponse.value = moviesDatabase
 
-        viewModel.getPopularMovies().observeForever(observer)
-        verify(observer).onChanged(viewModel.getPopularMovies().value)
+        `when`(movieCatalogueRepository.getPopularMovies(1, "", false)).thenReturn(moviesResponse)
+        val moviesEntity = viewModel.getPopularMovies(queryAndFavorite).getOrAwaitValueTest()
+        verify(movieCatalogueRepository).getPopularMovies(1, "", false)
+        assertNotNull(moviesEntity)
+        assertEquals(moviesResponse.value?.status, moviesEntity.status)
+        assertEquals(moviesResponse.value?.message, moviesEntity.message)
+        assertEquals(moviesResponse.value?.data, moviesEntity.data)
+        assertEquals(5, moviesEntity.data?.size)
+
+        viewModel.getPopularMovies(queryAndFavorite).observeForever(observer)
+        verify(observer).onChanged(viewModel.getPopularMovies(queryAndFavorite).value)
+    }
+
+    @Test
+    fun updateFavorite() {
+        viewModel.updateFavorite(DataDummy.generateSelectedMovies())
+        verify(movieCatalogueRepository).updateFavoriteMovie(DataDummy.generateSelectedMovies())
+        verifyNoMoreInteractions(movieCatalogueRepository)
     }
 }

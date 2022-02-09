@@ -28,7 +28,7 @@ interface MovieCatalogueDao {
     fun insertMovie(movie: MovieEntity)
 
     @Update
-    suspend fun updateMovies(movie: MoviesEntity)
+    fun updateMovies(movie: MoviesEntity)
 
     @RawQuery(observedEntities = [TvShowsEntity::class])
     fun getTvShows(query: SimpleSQLiteQuery): DataSource.Factory<Int, TvShowsEntity>
@@ -40,7 +40,7 @@ interface MovieCatalogueDao {
     fun insertTvShowsList(tvShows: List<TvShowsEntity>)
 
     @Update
-    suspend fun updateTvShows(tvShows: TvShowsEntity)
+    fun updateTvShows(tvShows: TvShowsEntity)
 
     @Query("SELECT * FROM TvShowEntity WHERE tvShowId = :id")
     fun getTvShow(id: Int) : LiveData<TvShowEntity>

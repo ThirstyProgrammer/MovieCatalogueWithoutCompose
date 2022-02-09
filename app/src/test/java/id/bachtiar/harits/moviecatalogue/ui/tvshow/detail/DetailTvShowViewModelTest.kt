@@ -7,7 +7,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import id.bachtiar.harits.moviecatalogue.data.DataResult
 import id.bachtiar.harits.moviecatalogue.data.MovieCatalogueRepository
-import id.bachtiar.harits.moviecatalogue.model.TvShow
+import id.bachtiar.harits.moviecatalogue.data.local.entity.TvShowEntity
 import id.bachtiar.harits.moviecatalogue.util.DataDummy
 import id.bachtiar.harits.moviecatalogue.utils.getOrAwaitValueTest
 import org.junit.Assert.assertEquals
@@ -31,27 +31,35 @@ class DetailTvShowViewModelTest {
     val mockitoRule: MockitoRule = MockitoJUnit.rule()
 
     private lateinit var viewModel: DetailTvShowViewModel
-    private lateinit var dummyResponse: DataResult<TvShow>
     private val movieCatalogueRepository: MovieCatalogueRepository = mock()
-    private var observer: Observer<DataResult<TvShow>> = mock()
+    private var observer: Observer<DataResult<TvShowEntity>> = mock()
 
     @Before
     fun setUp() {
         viewModel = DetailTvShowViewModel(movieCatalogueRepository)
-        dummyResponse = DataDummy.getTvShow()
     }
 
     @Test
     fun getTvShow() {
-        val tvShowResponse = MutableLiveData<DataResult<TvShow>>()
-        tvShowResponse.value = dummyResponse
-        `when`(movieCatalogueRepository.getTvShow(1)).thenReturn(tvShowResponse)
+        val responseDataResult = DataResult.success(DataDummy.generateSelectedTvShow())
+        val tvShow = MutableLiveData<DataResult<TvShowEntity>>()
+        tvShow.value = responseDataResult
+        `when`(movieCatalogueRepository.getTvShow(1)).thenReturn(tvShow)
         val response = viewModel.getTvShow(1).getOrAwaitValueTest()
         verify(movieCatalogueRepository).getTvShow(1)
         assertNotNull(response)
-        assertEquals(tvShowResponse.value?.status, response.status)
-        assertEquals(tvShowResponse.value?.message, response.message)
-        assertEquals(tvShowResponse.value?.data, response.data)
+        assertEquals(tvShow.value?.status, response.status)
+        assertEquals(tvShow.value?.message, response.message)
+        assertEquals(tvShow.value?.data?.tvShowId, response.data?.tvShowId)
+        assertEquals(tvShow.value?.data?.title, response.data?.title)
+        assertEquals(tvShow.value?.data?.overview, response.data?.overview)
+        assertEquals(tvShow.value?.data?.firstAirDate, response.data?.firstAirDate)
+        assertEquals(tvShow.value?.data?.poster, response.data?.poster)
+        assertEquals(tvShow.value?.data?.rating, response.data?.rating)
+        assertEquals(tvShow.value?.data?.totalUserRating, response.data?.totalUserRating)
+        assertEquals(tvShow.value?.data?.productionCompanies, response.data?.productionCompanies)
+        assertEquals(tvShow.value?.data?.genres, response.data?.genres)
+        assertEquals(tvShow.value?.data?.seasons, response.data?.seasons)
 
         viewModel.getTvShow(1).observeForever(observer)
         verify(observer).onChanged(viewModel.getTvShow(1).value)

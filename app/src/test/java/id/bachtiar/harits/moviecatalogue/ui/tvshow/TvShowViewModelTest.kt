@@ -3,11 +3,13 @@ package id.bachtiar.harits.moviecatalogue.ui.tvshow
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.paging.PagedList
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import id.bachtiar.harits.moviecatalogue.data.DataResult
 import id.bachtiar.harits.moviecatalogue.data.MovieCatalogueRepository
-import id.bachtiar.harits.moviecatalogue.model.TvShows
+import id.bachtiar.harits.moviecatalogue.data.local.entity.TvShowsEntity
 import id.bachtiar.harits.moviecatalogue.util.DataDummy
 import id.bachtiar.harits.moviecatalogue.utils.getOrAwaitValueTest
 import org.junit.Assert.assertEquals
@@ -31,29 +33,40 @@ class TvShowViewModelTest {
     val mockitoRule: MockitoRule = MockitoJUnit.rule()
 
     private lateinit var viewModel: TvShowViewModel
-    private lateinit var dummyResponse: DataResult<TvShows.Response>
     private val movieCatalogueRepository: MovieCatalogueRepository = mock()
-    private var observer: Observer<DataResult<TvShows.Response>> = mock()
+    private var observer: Observer<DataResult<PagedList<TvShowsEntity>>> = mock()
+    private var pagedList: PagedList<TvShowsEntity> = mock()
 
     @Before
     fun setUp() {
         viewModel = TvShowViewModel(movieCatalogueRepository)
-        dummyResponse = DataDummy.getTvShows()
     }
 
     @Test
     fun getPopularTvShows()  {
-        val tvShowsResponse = MutableLiveData<DataResult<TvShows.Response>>()
-        tvShowsResponse.value = dummyResponse
-        `when`(movieCatalogueRepository.getPopularTvShows(1)).thenReturn(tvShowsResponse)
-        val response = viewModel.getPopularTvShows().getOrAwaitValueTest()
-        verify(movieCatalogueRepository).getPopularTvShows(1)
-        assertNotNull(response)
-        assertEquals(tvShowsResponse.value?.status, response.status)
-        assertEquals(tvShowsResponse.value?.message, response.message)
-        assertEquals(tvShowsResponse.value?.data, response.data)
+        val queryAndFavorite = Pair("", false)
+        val tvShowsDatabase = DataResult.success(pagedList)
+        `when`(tvShowsDatabase.data?.size).thenReturn(5)
+        val tvShowsResponse = MutableLiveData<DataResult<PagedList<TvShowsEntity>>>()
+        tvShowsResponse.value = tvShowsDatabase
 
-        viewModel.getPopularTvShows().observeForever(observer)
-        verify(observer).onChanged(viewModel.getPopularTvShows().value)
+        `when`(movieCatalogueRepository.getPopularTvShows(1, queryAndFavorite.first, queryAndFavorite.second)).thenReturn(tvShowsResponse)
+        val tvShowsEntity = viewModel.getPopularTvShows(queryAndFavorite).getOrAwaitValueTest()
+        verify(movieCatalogueRepository).getPopularTvShows(1, queryAndFavorite.first, queryAndFavorite.second)
+        assertNotNull(tvShowsEntity)
+        assertEquals(tvShowsResponse.value?.status, tvShowsEntity.status)
+        assertEquals(tvShowsResponse.value?.message, tvShowsEntity.message)
+        assertEquals(tvShowsResponse.value?.data, tvShowsEntity.data)
+        assertEquals(5, tvShowsEntity.data?.size)
+
+        viewModel.getPopularTvShows(queryAndFavorite).observeForever(observer)
+        verify(observer).onChanged(viewModel.getPopularTvShows(queryAndFavorite).value)
+    }
+
+    @Test
+    fun updateFavorite() {
+        viewModel.updateFavorite(DataDummy.generateSelectedTvShows())
+        verify(movieCatalogueRepository).updateFavoriteTvShows(DataDummy.generateSelectedTvShows())
+        verifyNoMoreInteractions(movieCatalogueRepository)
     }
 }
