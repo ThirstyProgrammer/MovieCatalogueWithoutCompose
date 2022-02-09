@@ -14,6 +14,7 @@ import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.google.android.material.chip.Chip
+import id.bachtiar.harits.moviecatalogue.ui.MainActivity
 import id.bachtiar.harits.moviecatalogue.ui.movie.MovieViewHolder
 import id.bachtiar.harits.moviecatalogue.ui.tvshow.TvShowViewHolder
 import id.bachtiar.harits.moviecatalogue.util.EspressoIdlingResource

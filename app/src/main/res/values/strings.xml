@@ -8,4 +8,9 @@
     <string name="movies">Movies</string>
     <string name="tv_shows">Tv Shows</string>
     <string name="retake">Ulangi</string>
+    <string name="filter">filter</string>
+    <string name="search">Search</string>
+    <string name="favorite">Favorite</string>
+    <string name="normal">Normal</string>
+    <string name="search_hint">Find Movie or Tv Show…</string>
 </resources>

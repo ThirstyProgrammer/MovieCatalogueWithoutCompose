@@ -2,31 +2,35 @@ package id.bachtiar.harits.moviecatalogue.ui.movie
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
+import id.bachtiar.harits.moviecatalogue.data.local.entity.MoviesEntity
 import id.bachtiar.harits.moviecatalogue.databinding.ItemMovieBinding
-import id.bachtiar.harits.moviecatalogue.model.Movies
 
-class MovieAdapter constructor(private val items: List<Movies.Data>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MovieAdapter : PagedListAdapter<MoviesEntity, MovieViewHolder>(MOVIES_COMPARATOR) {
 
     private lateinit var listener: OnMovieClickCallback
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         val binding = ItemMovieBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MovieViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (holder) {
-            is MovieViewHolder -> {
-                holder.bind(items[position])
-                holder.itemView.setOnClickListener { listener.onItemClicked(items[position]) }
-            }
-        }
+    override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
+        val item = getItem(position)
+        holder.bind(item, movieClickCallback = listener)
+        holder.itemView.setOnClickListener { listener.onItemClicked(item) }
     }
-
-    override fun getItemCount(): Int = items.size
 
     fun setOnMovieClickCallback(onMovieClickCallback: OnMovieClickCallback) {
         this.listener = onMovieClickCallback
+    }
+
+    companion object {
+        val MOVIES_COMPARATOR = object: DiffUtil.ItemCallback<MoviesEntity>() {
+            override fun areItemsTheSame(oldItem: MoviesEntity, newItem: MoviesEntity): Boolean = oldItem == newItem
+
+            override fun areContentsTheSame(oldItem: MoviesEntity, newItem: MoviesEntity): Boolean = oldItem.movieId == newItem.movieId
+        }
     }
 }

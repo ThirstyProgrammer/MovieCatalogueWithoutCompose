@@ -24,13 +24,3 @@ fun ViewStateBinding.handleViewState(state: ViewState, message: String = "") {
         }
     }
 }
-
-fun ViewStateBinding.setErrorMessage(message: String) {
-    tvErrorMessage.text = message
-}
-
-fun ViewStateBinding.setOnRetakeClicked(onClick: () -> Unit) {
-    btnRetake.setOnClickListener {
-        onClick()
-    }
-}

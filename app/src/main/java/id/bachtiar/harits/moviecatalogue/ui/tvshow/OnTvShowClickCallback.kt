@@ -1,7 +1,8 @@
 package id.bachtiar.harits.moviecatalogue.ui.tvshow
 
-import id.bachtiar.harits.moviecatalogue.model.TvShows
+import id.bachtiar.harits.moviecatalogue.data.local.entity.TvShowsEntity
 
 interface OnTvShowClickCallback {
-    fun onItemClicked(data: TvShows.Data)
+    fun onItemClicked(data: TvShowsEntity?)
+    fun onFavouriteClicked(data: TvShowsEntity?)
 }

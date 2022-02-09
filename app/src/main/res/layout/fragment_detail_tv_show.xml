@@ -116,7 +116,7 @@
             app:constraint_referenced_ids="iv_cover, tv_sub_desc" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tv_cast_title"
+            android:id="@+id/tv_seasons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/margin_16"
@@ -133,7 +133,7 @@
             android:layout_marginTop="@dimen/margin_8"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_cast_title" />
+            app:layout_constraintTop_toBottomOf="@id/tv_seasons" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_category_title"

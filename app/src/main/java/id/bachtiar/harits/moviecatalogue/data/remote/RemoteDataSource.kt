@@ -3,7 +3,6 @@ package id.bachtiar.harits.moviecatalogue.data.remote
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import id.bachtiar.harits.moviecatalogue.BuildConfig
-import id.bachtiar.harits.moviecatalogue.data.DataResult
 import id.bachtiar.harits.moviecatalogue.model.Movie
 import id.bachtiar.harits.moviecatalogue.model.Movies
 import id.bachtiar.harits.moviecatalogue.model.TvShow
@@ -20,19 +19,22 @@ import javax.inject.Inject
 
 class RemoteDataSource @Inject constructor(private val apiService: ApiService) {
 
-    fun getPopularMovies(page: Int): LiveData<DataResult<Movies.Response>> {
-        val resultMovies = MutableLiveData<DataResult<Movies.Response>>()
+    fun getPopularMovies(page: Int): LiveData<ApiResponse<Movies.Response>> {
+        val resultMovies = MutableLiveData<ApiResponse<Movies.Response>>()
         EspressoIdlingResource.increment()
         CoroutineScope(Dispatchers.IO).launch {
-            resultMovies.postValue(DataResult.loading(null))
             withContext(Dispatchers.IO) {
                 try {
                     val result = apiService.getPopularMovies(API_KEY, DEFAULT_LANGUAGE, page)
-                    resultMovies.postValue(DataResult.success(result))
+                    if (result.results?.size != 0) {
+                        resultMovies.postValue(ApiResponse.success(result))
+                    }else{
+                        resultMovies.postValue(ApiResponse.empty("", result))
+                    }
                     EspressoIdlingResource.decrement()
                 } catch (throwable: Throwable) {
                     handleNetworkError(throwable)
-                    resultMovies.postValue(DataResult.error(handleNetworkError(throwable), null))
+                    resultMovies.postValue(ApiResponse.error(handleNetworkError(throwable), Movies.Response()))
                     EspressoIdlingResource.decrement()
                 }
             }
@@ -40,19 +42,22 @@ class RemoteDataSource @Inject constructor(private val apiService: ApiService) {
         return resultMovies
     }
 
-    fun getPopularTvShows(page: Int): LiveData<DataResult<TvShows.Response>> {
-        val resultTvShows = MutableLiveData<DataResult<TvShows.Response>>()
+    fun getPopularTvShows(page: Int): LiveData<ApiResponse<TvShows.Response>> {
+        val resultTvShows = MutableLiveData<ApiResponse<TvShows.Response>>()
         EspressoIdlingResource.increment()
         CoroutineScope(Dispatchers.IO).launch {
-            resultTvShows.postValue(DataResult.loading(null))
             withContext(Dispatchers.IO) {
                 try {
                     val result = apiService.getPopularTvShows(API_KEY, DEFAULT_LANGUAGE, page)
-                    resultTvShows.postValue(DataResult.success(result))
+                    if (result.results?.size != 0) {
+                        resultTvShows.postValue(ApiResponse.success(result))
+                    }else{
+                        resultTvShows.postValue(ApiResponse.empty("", result))
+                    }
                     EspressoIdlingResource.decrement()
                 } catch (throwable: Throwable) {
                     handleNetworkError(throwable)
-                    resultTvShows.postValue(DataResult.error(handleNetworkError(throwable), null))
+                    resultTvShows.postValue(ApiResponse.error(handleNetworkError(throwable), TvShows.Response()))
                     EspressoIdlingResource.decrement()
                 }
             }
@@ -60,38 +65,37 @@ class RemoteDataSource @Inject constructor(private val apiService: ApiService) {
         return resultTvShows
     }
 
-    fun getMovie(id: Int): LiveData<DataResult<Movie>> {
-        val resultMovie = MutableLiveData<DataResult<Movie>>()
+    fun getMovie(id: Int): LiveData<ApiResponse<Movie>> {
+        val resultMovie = MutableLiveData<ApiResponse<Movie>>()
         EspressoIdlingResource.increment()
         CoroutineScope(Dispatchers.IO).launch {
-            resultMovie.postValue(DataResult.loading(null))
             withContext(Dispatchers.IO) {
                 try {
                     val result = apiService.getMovie(id, API_KEY, DEFAULT_LANGUAGE)
-                    resultMovie.postValue(DataResult.success(result))
+                    resultMovie.postValue(ApiResponse.success(result))
                     EspressoIdlingResource.decrement()
                 } catch (throwable: Throwable) {
                     handleNetworkError(throwable)
-                    resultMovie.postValue(DataResult.error(handleNetworkError(throwable), null))
+                    resultMovie.postValue(ApiResponse.error(handleNetworkError(throwable), Movie()))
                     EspressoIdlingResource.decrement()
                 }
             }
         }
         return resultMovie
     }
-    fun getTvShow(id: Int): LiveData<DataResult<TvShow>> {
-        val resultTvShow = MutableLiveData<DataResult<TvShow>>()
+
+    fun getTvShow(id: Int): LiveData<ApiResponse<TvShow>> {
+        val resultTvShow = MutableLiveData<ApiResponse<TvShow>>()
         EspressoIdlingResource.increment()
         CoroutineScope(Dispatchers.IO).launch {
-            resultTvShow.postValue(DataResult.loading(null))
             withContext(Dispatchers.IO) {
                 try {
                     val result = apiService.getTvShow(id, API_KEY, DEFAULT_LANGUAGE)
-                    resultTvShow.postValue(DataResult.success(result))
+                    resultTvShow.postValue(ApiResponse.success(result))
                     EspressoIdlingResource.decrement()
                 } catch (throwable: Throwable) {
                     handleNetworkError(throwable)
-                    resultTvShow.postValue(DataResult.error(handleNetworkError(throwable), null))
+                    resultTvShow.postValue(ApiResponse.error(handleNetworkError(throwable), TvShow()))
                     EspressoIdlingResource.decrement()
                 }
             }

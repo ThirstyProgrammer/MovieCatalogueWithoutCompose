@@ -8,6 +8,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import id.bachtiar.harits.moviecatalogue.BuildConfig
 import id.bachtiar.harits.moviecatalogue.data.remote.RemoteDataSource
@@ -22,7 +23,7 @@ import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-@Module(includes = [CommonModule::class])
+@Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
@@ -46,12 +47,13 @@ object NetworkModule {
     @Provides
     @Singleton
     internal fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor, chuckerInterceptor: ChuckerInterceptor): OkHttpClient {
-        val builder = OkHttpClient.Builder()
-        builder.addInterceptor(loggingInterceptor)
-        builder.addInterceptor(chuckerInterceptor)
-        builder.connectTimeout(Constant.TIME_OUT, TimeUnit.SECONDS)
-        builder.writeTimeout(Constant.TIME_OUT, TimeUnit.SECONDS)
-        builder.readTimeout(Constant.TIME_OUT, TimeUnit.SECONDS)
+        val builder = OkHttpClient.Builder().apply {
+            addInterceptor(loggingInterceptor)
+            addInterceptor(chuckerInterceptor)
+            connectTimeout(Constant.TIME_OUT, TimeUnit.SECONDS)
+            writeTimeout(Constant.TIME_OUT, TimeUnit.SECONDS)
+            readTimeout(Constant.TIME_OUT, TimeUnit.SECONDS)
+        }
         return builder.build()
     }
 
@@ -73,7 +75,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideChucker(context: Context): ChuckerInterceptor {
+    fun provideChucker(@ApplicationContext context: Context): ChuckerInterceptor {
         val chuckerCollector = ChuckerCollector(context, true, RetentionManager.Period.ONE_HOUR)
         return ChuckerInterceptor.Builder(context)
             .collector(chuckerCollector)
@@ -84,7 +86,5 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRemoteDataSource(apiService: ApiService): RemoteDataSource {
-        return RemoteDataSource(apiService)
-    }
+    fun provideRemoteDataSource(apiService: ApiService) = RemoteDataSource(apiService)
 }

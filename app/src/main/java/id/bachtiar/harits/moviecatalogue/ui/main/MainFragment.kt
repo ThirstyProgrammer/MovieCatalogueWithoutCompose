@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import id.bachtiar.harits.moviecatalogue.ui.MainActivity
 import id.bachtiar.harits.moviecatalogue.R
 import id.bachtiar.harits.moviecatalogue.databinding.FragmentMainBinding
 import id.bachtiar.harits.moviecatalogue.ui.movie.MovieFragment
@@ -21,6 +22,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (requireActivity() as MainActivity).showMenu()
         requireActivity().title = getString(R.string.app_name)
         setupViewPager()
     }

@@ -1,15 +1,18 @@
 package id.bachtiar.harits.moviecatalogue.data
 
 import androidx.lifecycle.LiveData
-import id.bachtiar.harits.moviecatalogue.model.Movie
-import id.bachtiar.harits.moviecatalogue.model.Movies
-import id.bachtiar.harits.moviecatalogue.model.TvShow
-import id.bachtiar.harits.moviecatalogue.model.TvShows
+import androidx.paging.PagedList
+import id.bachtiar.harits.moviecatalogue.data.local.entity.MovieEntity
+import id.bachtiar.harits.moviecatalogue.data.local.entity.MoviesEntity
+import id.bachtiar.harits.moviecatalogue.data.local.entity.TvShowEntity
+import id.bachtiar.harits.moviecatalogue.data.local.entity.TvShowsEntity
 
 interface DataSource {
 
-    fun getPopularMovies(page: Int = 1): LiveData<DataResult<Movies.Response>>
-    fun getPopularTvShows(page: Int = 1): LiveData<DataResult<TvShows.Response>>
-    fun getMovie(id:Int): LiveData<DataResult<Movie>>
-    fun getTvShow(id:Int): LiveData<DataResult<TvShow>>
+    fun getPopularMovies(page: Int = 1, query: String, isFavorite: Boolean): LiveData<DataResult<PagedList<MoviesEntity>>>
+    suspend fun updateFavoriteMovie(movie: MoviesEntity)
+    fun getPopularTvShows(page: Int = 1, query: String, isFavorite: Boolean): LiveData<DataResult<PagedList<TvShowsEntity>>>
+    suspend fun updateFavoriteTvShows(tvShow: TvShowsEntity)
+    fun getMovie(id:Int): LiveData<DataResult<MovieEntity>>
+    fun getTvShow(id:Int): LiveData<DataResult<TvShowEntity>>
 }
