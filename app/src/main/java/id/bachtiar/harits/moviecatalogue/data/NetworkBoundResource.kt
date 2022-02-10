@@ -5,12 +5,14 @@ import androidx.lifecycle.MediatorLiveData
 import id.bachtiar.harits.moviecatalogue.data.remote.ApiResponse
 import id.bachtiar.harits.moviecatalogue.data.remote.StatusResponse
 import id.bachtiar.harits.moviecatalogue.util.AppExecutors
+import id.bachtiar.harits.moviecatalogue.util.EspressoIdlingResource
 
 abstract class NetworkBoundResource<ResultType, RequestType> (private val mExecutors: AppExecutors) {
 
     private val result = MediatorLiveData<DataResult<ResultType>>()
 
     init {
+        EspressoIdlingResource.increment()
         result.value = DataResult.loading(null)
 
         @Suppress("LeakingThis")
@@ -23,6 +25,7 @@ abstract class NetworkBoundResource<ResultType, RequestType> (private val mExecu
             } else {
                 result.addSource(dbSource) { newData ->
                     result.value = DataResult.success(newData)
+                    EspressoIdlingResource.decrement()
                 }
             }
         }
@@ -55,18 +58,21 @@ abstract class NetworkBoundResource<ResultType, RequestType> (private val mExecu
                         mExecutors.mainThread().execute {
                             result.addSource(loadFromDB()) { newData ->
                                 result.value = DataResult.success(newData)
+                                EspressoIdlingResource.decrement()
                             }
                         }
                     }
                 StatusResponse.EMPTY -> mExecutors.mainThread().execute {
                     result.addSource(loadFromDB()) { newData ->
                         result.value = DataResult.success(newData)
+                        EspressoIdlingResource.decrement()
                     }
                 }
                 StatusResponse.ERROR -> {
                     onFetchFailed()
                     result.addSource(dbSource) { newData ->
                         result.value = DataResult.error(response.message, newData)
+                        EspressoIdlingResource.decrement()
                     }
                 }
             }
