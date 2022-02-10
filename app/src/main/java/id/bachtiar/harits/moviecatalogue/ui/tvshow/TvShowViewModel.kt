@@ -15,7 +15,7 @@ class TvShowViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun getPopularTvShows(queryAndFavorite: Pair<String, Boolean>): LiveData<DataResult<PagedList<TvShowsEntity>>> =
-        repo.getPopularTvShows(query = queryAndFavorite.first, isFavorite = queryAndFavorite.second)
+        repo.getPopularTvShows(queryAndFavorite = queryAndFavorite)
 
     fun updateFavorite(tvShow: TvShowsEntity) {
         repo.updateFavoriteTvShows(tvShow)

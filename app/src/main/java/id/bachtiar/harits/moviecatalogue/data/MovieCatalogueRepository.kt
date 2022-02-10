@@ -12,7 +12,6 @@ import id.bachtiar.harits.moviecatalogue.data.remote.ApiResponse
 import id.bachtiar.harits.moviecatalogue.data.remote.RemoteDataSource
 import id.bachtiar.harits.moviecatalogue.model.*
 import id.bachtiar.harits.moviecatalogue.util.AppExecutors
-import id.bachtiar.harits.moviecatalogue.util.FilterAndSearchUtils
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
@@ -22,7 +21,7 @@ class MovieCatalogueRepository @Inject constructor(
     private val localDataSource: LocalDataSource,
     private val appExecutors: AppExecutors
 ) : DataSource {
-    override fun getPopularMovies(page: Int, query: String, isFavorite: Boolean): LiveData<DataResult<PagedList<MoviesEntity>>> {
+    override fun getPopularMovies(page: Int, queryAndFavorite: Pair<String, Boolean>): LiveData<DataResult<PagedList<MoviesEntity>>> {
         return object : NetworkBoundResource<PagedList<MoviesEntity>, Movies.Response>(appExecutors) {
             override fun loadFromDB(): LiveData<PagedList<MoviesEntity>> {
                 val config = PagedList.Config.Builder()
@@ -30,7 +29,7 @@ class MovieCatalogueRepository @Inject constructor(
                     .setInitialLoadSizeHint(8)
                     .setPageSize(8)
                     .build()
-                return LivePagedListBuilder(localDataSource.getMovies(FilterAndSearchUtils.getMovies(query, isFavorite)), config).build()
+                return LivePagedListBuilder(localDataSource.getMovies(queryAndFavorite), config).build()
             }
 
             override fun shouldFetch(data: PagedList<MoviesEntity>?): Boolean = data == null || data.isEmpty()
@@ -61,7 +60,7 @@ class MovieCatalogueRepository @Inject constructor(
         }
     }
 
-    override fun getPopularTvShows(page: Int, query: String, isFavorite: Boolean): LiveData<DataResult<PagedList<TvShowsEntity>>> {
+    override fun getPopularTvShows(page: Int, queryAndFavorite: Pair<String, Boolean>): LiveData<DataResult<PagedList<TvShowsEntity>>> {
         return object : NetworkBoundResource<PagedList<TvShowsEntity>, TvShows.Response>(appExecutors) {
             override fun loadFromDB(): LiveData<PagedList<TvShowsEntity>> {
                 val config = PagedList.Config.Builder()
@@ -69,7 +68,7 @@ class MovieCatalogueRepository @Inject constructor(
                     .setInitialLoadSizeHint(8)
                     .setPageSize(8)
                     .build()
-                return LivePagedListBuilder(localDataSource.getTvShows(FilterAndSearchUtils.getTvShows(query, isFavorite)), config).build()
+                return LivePagedListBuilder(localDataSource.getTvShows(queryAndFavorite), config).build()
             }
 
             override fun shouldFetch(data: PagedList<TvShowsEntity>?): Boolean = data == null || data.isEmpty()

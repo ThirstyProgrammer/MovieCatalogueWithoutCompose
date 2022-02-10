@@ -50,9 +50,9 @@ class TvShowViewModelTest {
         val tvShowsResponse = MutableLiveData<DataResult<PagedList<TvShowsEntity>>>()
         tvShowsResponse.value = tvShowsDatabase
 
-        `when`(movieCatalogueRepository.getPopularTvShows(1, queryAndFavorite.first, queryAndFavorite.second)).thenReturn(tvShowsResponse)
+        `when`(movieCatalogueRepository.getPopularTvShows(1, queryAndFavorite)).thenReturn(tvShowsResponse)
         val tvShowsEntity = viewModel.getPopularTvShows(queryAndFavorite).getOrAwaitValueTest()
-        verify(movieCatalogueRepository).getPopularTvShows(1, queryAndFavorite.first, queryAndFavorite.second)
+        verify(movieCatalogueRepository).getPopularTvShows(1, queryAndFavorite)
         assertNotNull(tvShowsEntity)
         assertEquals(tvShowsResponse.value?.status, tvShowsEntity.status)
         assertEquals(tvShowsResponse.value?.message, tvShowsEntity.message)

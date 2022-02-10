@@ -15,7 +15,7 @@ class MovieViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun getPopularMovies(queryAndFavorite: Pair<String, Boolean>): LiveData<DataResult<PagedList<MoviesEntity>>> =
-        repo.getPopularMovies(query = queryAndFavorite.first, isFavorite = queryAndFavorite.second)
+        repo.getPopularMovies(queryAndFavorite =  queryAndFavorite)
 
     fun updateFavorite(movie: MoviesEntity) {
         repo.updateFavoriteMovie(movie)

@@ -51,9 +51,9 @@ class MovieViewModelTest {
         val moviesResponse = MutableLiveData<DataResult<PagedList<MoviesEntity>>>()
         moviesResponse.value = moviesDatabase
 
-        `when`(movieCatalogueRepository.getPopularMovies(1, "", false)).thenReturn(moviesResponse)
+        `when`(movieCatalogueRepository.getPopularMovies(1, queryAndFavorite)).thenReturn(moviesResponse)
         val moviesEntity = viewModel.getPopularMovies(queryAndFavorite).getOrAwaitValueTest()
-        verify(movieCatalogueRepository).getPopularMovies(1, "", false)
+        verify(movieCatalogueRepository).getPopularMovies(1, queryAndFavorite)
         assertNotNull(moviesEntity)
         assertEquals(moviesResponse.value?.status, moviesEntity.status)
         assertEquals(moviesResponse.value?.message, moviesEntity.message)

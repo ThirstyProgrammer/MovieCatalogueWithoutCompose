@@ -12,7 +12,6 @@ import id.bachtiar.harits.moviecatalogue.data.remote.ApiResponse
 import id.bachtiar.harits.moviecatalogue.data.remote.RemoteDataSource
 import id.bachtiar.harits.moviecatalogue.model.*
 import id.bachtiar.harits.moviecatalogue.util.AppExecutors
-import id.bachtiar.harits.moviecatalogue.util.FilterAndSearchUtils
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -20,9 +19,9 @@ class FakeMovieCatalogueRepository(
     private val remotedDataSource: RemoteDataSource,
     private val localDataSource: LocalDataSource,
     private val appExecutors: AppExecutors
-): DataSource {
+) : DataSource {
 
-    override fun getPopularMovies(page: Int, query: String, isFavorite: Boolean): LiveData<DataResult<PagedList<MoviesEntity>>> {
+    override fun getPopularMovies(page: Int, queryAndFavorite: Pair<String, Boolean>): LiveData<DataResult<PagedList<MoviesEntity>>> {
         return object : NetworkBoundResource<PagedList<MoviesEntity>, Movies.Response>(appExecutors) {
             override fun loadFromDB(): LiveData<PagedList<MoviesEntity>> {
                 val config = PagedList.Config.Builder()
@@ -30,7 +29,7 @@ class FakeMovieCatalogueRepository(
                     .setInitialLoadSizeHint(8)
                     .setPageSize(8)
                     .build()
-                return LivePagedListBuilder(localDataSource.getMovies(FilterAndSearchUtils.getMovies(query, isFavorite)), config).build()
+                return LivePagedListBuilder(localDataSource.getMovies(queryAndFavorite), config).build()
             }
 
             override fun shouldFetch(data: PagedList<MoviesEntity>?): Boolean = data == null || data.isEmpty()
@@ -55,13 +54,11 @@ class FakeMovieCatalogueRepository(
     }
 
     override fun updateFavoriteMovie(movie: MoviesEntity) {
-        appExecutors.diskIO().execute {
-            movie.isFavourite = !movie.isFavourite
-            localDataSource.updateMovies(movie)
-        }
+        movie.isFavourite = !movie.isFavourite
+        localDataSource.updateMovies(movie)
     }
 
-    override fun getPopularTvShows(page: Int, query: String, isFavorite: Boolean): LiveData<DataResult<PagedList<TvShowsEntity>>> {
+    override fun getPopularTvShows(page: Int, queryAndFavorite: Pair<String, Boolean>): LiveData<DataResult<PagedList<TvShowsEntity>>> {
         return object : NetworkBoundResource<PagedList<TvShowsEntity>, TvShows.Response>(appExecutors) {
             override fun loadFromDB(): LiveData<PagedList<TvShowsEntity>> {
                 val config = PagedList.Config.Builder()
@@ -69,7 +66,7 @@ class FakeMovieCatalogueRepository(
                     .setInitialLoadSizeHint(8)
                     .setPageSize(8)
                     .build()
-                return LivePagedListBuilder(localDataSource.getTvShows(FilterAndSearchUtils.getTvShows(query, isFavorite)), config).build()
+                return LivePagedListBuilder(localDataSource.getTvShows(queryAndFavorite), config).build()
             }
 
             override fun shouldFetch(data: PagedList<TvShowsEntity>?): Boolean = data == null || data.isEmpty()
@@ -94,10 +91,8 @@ class FakeMovieCatalogueRepository(
     }
 
     override fun updateFavoriteTvShows(tvShow: TvShowsEntity) {
-        appExecutors.diskIO().execute {
-            tvShow.isFavourite = !tvShow.isFavourite
-            localDataSource.updateTvShows(tvShow)
-        }
+        tvShow.isFavourite = !tvShow.isFavourite
+        localDataSource.updateTvShows(tvShow)
     }
 
     override fun getMovie(id: Int): LiveData<DataResult<MovieEntity>> {
@@ -157,7 +152,7 @@ class FakeMovieCatalogueRepository(
         }.asLiveData()
     }
 
-    private fun generateProductionCompanies(data: List<ProductionCompanies>) : String {
+    private fun generateProductionCompanies(data: List<ProductionCompanies>): String {
         var result = ""
         data.forEachIndexed { index, productionCompany ->
             result += if (index == (data.size - 1)) {
@@ -169,9 +164,9 @@ class FakeMovieCatalogueRepository(
         return result
     }
 
-    private fun generateCategories(data: List<Genres>) : String {
+    private fun generateCategories(data: List<Genres>): String {
         var result = ""
-        data.forEachIndexed{index, genres ->
+        data.forEachIndexed { index, genres ->
             result += if (index == (data.size - 1)) {
                 genres.name
             } else {
