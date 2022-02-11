@@ -3,6 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/bg_search.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_favorite.xml" value="0.1485" />
+        <entry key="app/src/main/res/drawable/ic_filter_alt.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_search.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.22870370370370371" />
         <entry key="app/src/main/res/layout/fragment_detail.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_detail_movie.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_detail_tv_show.xml" value="0.1" />
@@ -16,6 +21,7 @@
         <entry key="app/src/main/res/layout/item_seasons.xml" value="0.1390625" />
         <entry key="app/src/main/res/layout/item_tv_show.xml" value="0.2828125" />
         <entry key="app/src/main/res/layout/view_state.xml" value="0.1390625" />
+        <entry key="app/src/main/res/menu/option_menu.xml" value="0.22870370370370371" />
       </map>
     </option>
   </component>

@@ -36,9 +36,9 @@ class TvShowFragment : Fragment(R.layout.fragment_tv_show), OnTvShowClickCallbac
         if (data != null) {
             mViewModel.updateFavorite(data)
             val text = if (data.isFavourite) {
-                "Favorite Added"
-            } else {
                 "Favorite Removed"
+            } else {
+                "Favorite Added"
             }
             Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).show()
         }

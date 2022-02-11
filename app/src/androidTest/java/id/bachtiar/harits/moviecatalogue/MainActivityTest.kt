@@ -1,14 +1,14 @@
 package id.bachtiar.harits.moviecatalogue
 
 import android.view.View
+import android.view.WindowManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
+import androidx.test.espresso.*
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.UiController
-import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.contrib.RecyclerViewActions.scrollTo
 import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -20,6 +20,8 @@ import id.bachtiar.harits.moviecatalogue.ui.tvshow.TvShowViewHolder
 import id.bachtiar.harits.moviecatalogue.util.EspressoIdlingResource
 import org.hamcrest.Description
 import org.hamcrest.Matcher
+import org.hamcrest.Matchers.`is`
+import org.hamcrest.TypeSafeMatcher
 import org.hamcrest.core.AllOf.allOf
 import org.hamcrest.core.StringContains.containsString
 import org.junit.After
@@ -71,6 +73,7 @@ class MainActivityTest {
             .perform(scrollTo<TvShowViewHolder>(hasDescendant(withText("Peaky Blinders"))))
         onView(allOf(withText("Peaky Blinders"), isDescendantOfA(withId(R.id.item_tv_show))))
             .perform(click())
+        onView(isRoot()).perform(waitFor(500L))
         checkDetailTvShow()
         onView(allOf(withText("Peaky Blinders"), isDescendantOfA(withId(R.id.view_pager))))
             .check(matches(isDisplayed()))
@@ -83,8 +86,50 @@ class MainActivityTest {
             .perform(scrollTo<MovieViewHolder>(hasDescendant(withText("Sing 2"))))
         onView(allOf(withText("Sing 2"), isDescendantOfA(withId(R.id.item_movie))))
             .perform(click())
+        onView(isRoot()).perform(waitFor(500L))
         checkDetailMovie()
         onView(allOf(withText("Sing 2"), isDescendantOfA(withId(R.id.view_pager))))
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun checkAddAndRemoveFavoriteMovie() {
+        onView(withId(R.id.rv_movie))
+            .check(matches(isDisplayed()))
+            .perform(RecyclerViewActions.actionOnItemAtPosition<MovieViewHolder>(2, clickOnViewChild(R.id.btn_favorite)))
+        onView(withText("Favorite Added"))
+            .inRoot(ToastMatcher())
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.normal))
+            .perform(click())
+        onView(withId(R.id.rv_movie)).check(RecyclerViewItemCountAssertion(1))
+        onView(isRoot()).perform(waitFor(2000L))
+        onView(withId(R.id.rv_movie))
+            .perform(RecyclerViewActions.actionOnItemAtPosition<MovieViewHolder>(0, clickOnViewChild(R.id.btn_favorite)))
+        onView(withText("Favorite Removed"))
+            .inRoot(ToastMatcher())
+            .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun checkAddAndRemoveFavoriteTvShow() {
+        onView(withId(R.id.view_pager))
+            .perform(swipeLeft())
+        onView(isRoot()).perform(waitFor(500L))
+        onView(withId(R.id.rv_tv_show))
+            .check(matches(isDisplayed()))
+            .perform(RecyclerViewActions.actionOnItemAtPosition<MovieViewHolder>(2, clickOnViewChild(R.id.btn_favorite)))
+        onView(withText("Favorite Added"))
+            .inRoot(ToastMatcher())
+            .check(matches(isDisplayed()))
+        onView(withId(R.id.normal))
+            .perform(click())
+        onView(withId(R.id.rv_tv_show)).check(RecyclerViewItemCountAssertion(1))
+        onView(isRoot()).perform(waitFor(2000L))
+        onView(withId(R.id.rv_tv_show))
+            .perform(RecyclerViewActions.actionOnItemAtPosition<MovieViewHolder>(0, clickOnViewChild(R.id.btn_favorite)))
+        onView(withText("Favorite Removed"))
+            .inRoot(ToastMatcher())
             .check(matches(isDisplayed()))
     }
 
@@ -150,6 +195,30 @@ class MainActivityTest {
         }
     }
 
+    private fun clickOnViewChild(viewId: Int) = object : ViewAction {
+        override fun getConstraints() = null
+
+        override fun getDescription() = "Click on a child view with specified id."
+
+        override fun perform(uiController: UiController, view: View) = click().perform(uiController, view.findViewById(viewId))
+    }
+
+    private fun waitFor(delay: Long): ViewAction {
+        return object : ViewAction {
+            override fun getConstraints(): Matcher<View> {
+                return isRoot()
+            }
+
+            override fun getDescription(): String {
+                return "wait for " + delay + "milliseconds"
+            }
+
+            override fun perform(uiController: UiController, view: View?) {
+                uiController.loopMainThreadForAtLeast(delay)
+            }
+        }
+    }
+
     class ScrollToBottomAction : ViewAction {
         override fun getDescription(): String {
             return "scroll RecyclerView to bottom"
@@ -165,6 +234,36 @@ class MainActivityTest {
             val position = itemCount?.minus(1) ?: 0
             recyclerView.scrollToPosition(position)
             uiController?.loopMainThreadUntilIdle()
+        }
+    }
+
+    class ToastMatcher : TypeSafeMatcher<Root>() {
+
+        override fun describeTo(description: Description) {
+            description.appendText("is toast")
+        }
+
+        override fun matchesSafely(root: Root): Boolean {
+            val type = root.windowLayoutParams.get().type
+            if (type == WindowManager.LayoutParams.TYPE_TOAST) {
+                val windowToken = root.decorView.windowToken
+                val appToken = root.decorView.applicationWindowToken
+                if (windowToken === appToken) {
+                    return true
+                }
+            }
+            return false
+        }
+    }
+
+    class RecyclerViewItemCountAssertion(private val expectedCount: Int) : ViewAssertion {
+        override fun check(view: View, noViewFoundException: NoMatchingViewException?) {
+            if (noViewFoundException != null) {
+                throw noViewFoundException
+            }
+            val recyclerView = view as RecyclerView
+            val adapter = recyclerView.adapter
+            assertThat(adapter!!.itemCount, `is`(expectedCount))
         }
     }
 }
