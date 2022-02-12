@@ -36,6 +36,7 @@ class MovieViewModelTest {
 
     private val movieCatalogueRepository: MovieCatalogueRepository = mock()
     private var observer: Observer<DataResult<PagedList<MoviesEntity>>> = mock()
+    private var observerFavorite: Observer<PagedList<MoviesEntity>> = mock()
     private var pagedList: PagedList<MoviesEntity> = mock()
 
     @Before
@@ -45,23 +46,41 @@ class MovieViewModelTest {
 
     @Test
     fun getPopularMovies() {
-        val queryAndFavorite = Pair("", false)
+        val query = "QUERY"
         val moviesDatabase = DataResult.success(pagedList)
         `when`(moviesDatabase.data?.size).thenReturn(5)
         val moviesResponse = MutableLiveData<DataResult<PagedList<MoviesEntity>>>()
         moviesResponse.value = moviesDatabase
 
-        `when`(movieCatalogueRepository.getPopularMovies(1, queryAndFavorite)).thenReturn(moviesResponse)
-        val moviesEntity = viewModel.getPopularMovies(queryAndFavorite).getOrAwaitValueTest()
-        verify(movieCatalogueRepository).getPopularMovies(1, queryAndFavorite)
+        `when`(movieCatalogueRepository.getPopularMovies(1, query)).thenReturn(moviesResponse)
+        val moviesEntity = viewModel.getPopularMovies(query).getOrAwaitValueTest()
+        verify(movieCatalogueRepository).getPopularMovies(1, query)
         assertNotNull(moviesEntity)
         assertEquals(moviesResponse.value?.status, moviesEntity.status)
         assertEquals(moviesResponse.value?.message, moviesEntity.message)
         assertEquals(moviesResponse.value?.data, moviesEntity.data)
         assertEquals(5, moviesEntity.data?.size)
 
-        viewModel.getPopularMovies(queryAndFavorite).observeForever(observer)
-        verify(observer).onChanged(viewModel.getPopularMovies(queryAndFavorite).value)
+        viewModel.getPopularMovies(query).observeForever(observer)
+        verify(observer).onChanged(viewModel.getPopularMovies(query).value)
+    }
+
+    @Test
+    fun getFavoriteMovies() {
+        val query = "QUERY"
+        val favoriteMovies = pagedList
+        `when`(favoriteMovies.size).thenReturn(5)
+        val movies= MutableLiveData<PagedList<MoviesEntity>>()
+        movies.value = favoriteMovies
+
+        `when`(movieCatalogueRepository.getFavoriteMoviesWithQuery(query)).thenReturn(movies)
+        val moviesEntity = viewModel.getFavoriteMovies(query).getOrAwaitValueTest()
+        verify(movieCatalogueRepository).getFavoriteMoviesWithQuery(query)
+        assertNotNull(moviesEntity)
+        assertEquals(5, moviesEntity.size)
+
+        viewModel.getFavoriteMovies(query).observeForever(observerFavorite)
+        verify(observerFavorite).onChanged(viewModel.getFavoriteMovies(query).value)
     }
 
     @Test

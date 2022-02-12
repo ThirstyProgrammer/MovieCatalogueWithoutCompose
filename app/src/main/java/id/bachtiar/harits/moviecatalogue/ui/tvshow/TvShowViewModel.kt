@@ -14,8 +14,9 @@ class TvShowViewModel @Inject constructor(
     private val repo: MovieCatalogueRepository
 ) : ViewModel() {
 
-    fun getPopularTvShows(queryAndFavorite: Pair<String, Boolean>): LiveData<DataResult<PagedList<TvShowsEntity>>> =
-        repo.getPopularTvShows(queryAndFavorite = queryAndFavorite)
+    fun getPopularTvShows(query: String): LiveData<DataResult<PagedList<TvShowsEntity>>> = repo.getPopularTvShows(query = query)
+
+    fun getFavoriteTvShows(query: String): LiveData<PagedList<TvShowsEntity>> = repo.getFavoriteTvShowsWithQuery(query)
 
     fun updateFavorite(tvShow: TvShowsEntity) {
         repo.updateFavoriteTvShows(tvShow)

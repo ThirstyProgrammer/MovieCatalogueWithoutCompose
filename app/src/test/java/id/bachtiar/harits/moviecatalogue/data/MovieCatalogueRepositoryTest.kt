@@ -16,8 +16,7 @@ import id.bachtiar.harits.moviecatalogue.util.AppExecutors
 import id.bachtiar.harits.moviecatalogue.util.DataDummy
 import id.bachtiar.harits.moviecatalogue.utils.PagedListUtil
 import id.bachtiar.harits.moviecatalogue.utils.getOrAwaitValueTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.`when`
@@ -33,19 +32,21 @@ class MovieCatalogueRepositoryTest {
     private val fakeRepository = FakeMovieCatalogueRepository(remote, local, appExecutors)
 
     private val dummyResponseMovies = DataDummy.getMovies()
+    private val dummyResponseFavoriteMovies = DataDummy.getFavoriteMovies()
     private val dummyResponseMovie = DataDummy.getMovie()
     private val dummyResponseTvShows = DataDummy.getTvShows()
+    private val dummyResponseFavoriteTvShows = DataDummy.getFavoriteTvShows()
     private val dummyResponseTvShow = DataDummy.getTvShow()
 
 
     @Test
     fun getPopularMovies() {
-        val queryAndFavorite = Pair("", false)
+        val query = "QUERY"
         val dataSourceFactory: DataSource.Factory<Int, MoviesEntity> = mock()
-        `when`(local.getMovies(queryAndFavorite)).thenReturn(dataSourceFactory)
-        fakeRepository.getPopularMovies(1, queryAndFavorite)
+        `when`(local.getMovies(query)).thenReturn(dataSourceFactory)
+        fakeRepository.getPopularMovies(1, query)
         val moviesEntities = DataResult.success(PagedListUtil.mockPagedList(DataDummy.getMovies()))
-        verify(local).getMovies(queryAndFavorite)
+        verify(local).getMovies(query)
         assertNotNull(moviesEntities.data)
         assertEquals(dummyResponseMovies.size, moviesEntities.data?.size)
         assertEquals(dummyResponseMovies.first(), moviesEntities.data?.first())
@@ -53,7 +54,23 @@ class MovieCatalogueRepositoryTest {
     }
 
     @Test
-    fun updateFavoriteMovie(){
+    fun getFavoriteMoviesWithQuery() {
+        val query = "QUERY"
+        val dataSourceFactory: DataSource.Factory<Int, MoviesEntity> = mock()
+        `when`(local.getFavoriteMoviesWithQuery(query)).thenReturn(dataSourceFactory)
+        fakeRepository.getFavoriteMoviesWithQuery(query)
+        val listMoviesEntity = PagedListUtil.mockPagedList(DataDummy.getFavoriteMovies())
+        verify(local).getFavoriteMoviesWithQuery(query)
+        assertNotNull(listMoviesEntity)
+        assertEquals(dummyResponseFavoriteMovies.size, listMoviesEntity.size)
+        assertEquals(dummyResponseFavoriteMovies.first(), listMoviesEntity.first())
+        assertTrue(listMoviesEntity.first().isFavourite)
+        assertEquals(dummyResponseFavoriteMovies.last(), listMoviesEntity.last())
+        assertTrue(listMoviesEntity.last().isFavourite)
+    }
+
+    @Test
+    fun updateFavoriteMovie() {
         fakeRepository.updateFavoriteMovie(DataDummy.generateSelectedMovies())
         verify(local).updateMovies(DataDummy.generateSelectedUpdatedMovies())
         verifyNoMoreInteractions(local)
@@ -61,12 +78,12 @@ class MovieCatalogueRepositoryTest {
 
     @Test
     fun getPopularTvShows() {
-        val queryAndFavorite = Pair("", false)
+        val query = "QUERY"
         val dataSourceFactory: DataSource.Factory<Int, TvShowsEntity> = mock()
-        `when`(local.getTvShows(queryAndFavorite)).thenReturn(dataSourceFactory)
-        fakeRepository.getPopularTvShows(1, queryAndFavorite)
+        `when`(local.getTvShows(query)).thenReturn(dataSourceFactory)
+        fakeRepository.getPopularTvShows(1, query)
         val moviesEntities = DataResult.success(PagedListUtil.mockPagedList(DataDummy.getTvShows()))
-        verify(local).getTvShows(queryAndFavorite)
+        verify(local).getTvShows(query)
         assertNotNull(moviesEntities.data)
         assertEquals(dummyResponseTvShows.size, moviesEntities.data?.size)
         assertEquals(dummyResponseTvShows.first(), moviesEntities.data?.first())
@@ -74,7 +91,23 @@ class MovieCatalogueRepositoryTest {
     }
 
     @Test
-    fun updateFavoriteTvShows(){
+    fun getFavoriteTvShowsWithQuery() {
+        val query = "QUERY"
+        val dataSourceFactory: DataSource.Factory<Int, TvShowsEntity> = mock()
+        `when`(local.getFavoriteTvShowsWithQuery(query)).thenReturn(dataSourceFactory)
+        fakeRepository.getFavoriteTvShowsWithQuery(query)
+        val listMoviesEntity = PagedListUtil.mockPagedList(DataDummy.getFavoriteTvShows())
+        verify(local).getFavoriteTvShowsWithQuery(query)
+        assertNotNull(listMoviesEntity)
+        assertEquals(dummyResponseFavoriteTvShows.size, listMoviesEntity.size)
+        assertEquals(dummyResponseFavoriteTvShows.first(), listMoviesEntity.first())
+        assertTrue(listMoviesEntity.first().isFavourite)
+        assertEquals(dummyResponseFavoriteTvShows.last(), listMoviesEntity.last())
+        assertTrue(listMoviesEntity.last().isFavourite)
+    }
+
+    @Test
+    fun updateFavoriteTvShows() {
         fakeRepository.updateFavoriteTvShows(DataDummy.generateSelectedTvShows())
         verify(local).updateTvShows(DataDummy.generateSelectedUpdatedTvShows())
         verifyNoMoreInteractions(local)

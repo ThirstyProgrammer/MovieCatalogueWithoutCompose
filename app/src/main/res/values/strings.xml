@@ -13,4 +13,9 @@
     <string name="favorite">Favorite</string>
     <string name="normal">Normal</string>
     <string name="search_hint">Find Movie or Tv Show…</string>
+    <string name="not_has_favorite_movies">Tidak Memiliki Favorite Movies</string>
+    <string name="not_has_favorite_tv_shows">Tidak Memiliki Favorite TV Shows</string>
+    <string name="favorite_added">Favorite Added</string>
+    <string name="favorite_removed">Favorite Removed</string>
+    <string name="empty" />
 </resources>

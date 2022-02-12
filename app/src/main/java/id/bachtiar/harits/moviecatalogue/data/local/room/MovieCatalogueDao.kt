@@ -15,6 +15,9 @@ interface MovieCatalogueDao {
     @RawQuery(observedEntities = [MoviesEntity::class])
     fun getMovies(query: SimpleSQLiteQuery): DataSource.Factory<Int, MoviesEntity>
 
+    @RawQuery(observedEntities = [MoviesEntity::class])
+    fun getFavoriteMoviesWithQuery(query: SimpleSQLiteQuery): DataSource.Factory<Int, MoviesEntity>
+
     @Query("SELECT * FROM MoviesEntity WHERE isFavourite")
     fun getFavoriteMovies(): List<MoviesEntity>
 
@@ -32,6 +35,9 @@ interface MovieCatalogueDao {
 
     @RawQuery(observedEntities = [TvShowsEntity::class])
     fun getTvShows(query: SimpleSQLiteQuery): DataSource.Factory<Int, TvShowsEntity>
+
+    @RawQuery(observedEntities = [TvShowsEntity::class])
+    fun getFavoriteTvShowsWithQuery(query: SimpleSQLiteQuery): DataSource.Factory<Int, TvShowsEntity>
 
     @Query("SELECT * FROM TvShowsEntity WHERE isFavourite")
     fun getFavoriteTvShows(): List<TvShowsEntity>

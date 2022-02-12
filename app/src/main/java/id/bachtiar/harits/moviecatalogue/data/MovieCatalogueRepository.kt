@@ -21,7 +21,7 @@ class MovieCatalogueRepository @Inject constructor(
     private val localDataSource: LocalDataSource,
     private val appExecutors: AppExecutors
 ) : DataSource {
-    override fun getPopularMovies(page: Int, queryAndFavorite: Pair<String, Boolean>): LiveData<DataResult<PagedList<MoviesEntity>>> {
+    override fun getPopularMovies(page: Int, query: String): LiveData<DataResult<PagedList<MoviesEntity>>> {
         return object : NetworkBoundResource<PagedList<MoviesEntity>, Movies.Response>(appExecutors) {
             override fun loadFromDB(): LiveData<PagedList<MoviesEntity>> {
                 val config = PagedList.Config.Builder()
@@ -29,7 +29,7 @@ class MovieCatalogueRepository @Inject constructor(
                     .setInitialLoadSizeHint(8)
                     .setPageSize(8)
                     .build()
-                return LivePagedListBuilder(localDataSource.getMovies(queryAndFavorite), config).build()
+                return LivePagedListBuilder(localDataSource.getMovies(query), config).build()
             }
 
             override fun shouldFetch(data: PagedList<MoviesEntity>?): Boolean = data == null || data.isEmpty()
@@ -53,6 +53,15 @@ class MovieCatalogueRepository @Inject constructor(
         }.asLiveData()
     }
 
+    override fun getFavoriteMoviesWithQuery(query: String): LiveData<PagedList<MoviesEntity>> {
+        val config = PagedList.Config.Builder()
+            .setEnablePlaceholders(false)
+            .setInitialLoadSizeHint(8)
+            .setPageSize(8)
+            .build()
+        return LivePagedListBuilder(localDataSource.getFavoriteMoviesWithQuery(query), config).build()
+    }
+
     override fun updateFavoriteMovie(movie: MoviesEntity) {
         appExecutors.diskIO().execute {
             movie.isFavourite = !movie.isFavourite
@@ -60,7 +69,7 @@ class MovieCatalogueRepository @Inject constructor(
         }
     }
 
-    override fun getPopularTvShows(page: Int, queryAndFavorite: Pair<String, Boolean>): LiveData<DataResult<PagedList<TvShowsEntity>>> {
+    override fun getPopularTvShows(page: Int, query: String): LiveData<DataResult<PagedList<TvShowsEntity>>> {
         return object : NetworkBoundResource<PagedList<TvShowsEntity>, TvShows.Response>(appExecutors) {
             override fun loadFromDB(): LiveData<PagedList<TvShowsEntity>> {
                 val config = PagedList.Config.Builder()
@@ -68,7 +77,7 @@ class MovieCatalogueRepository @Inject constructor(
                     .setInitialLoadSizeHint(8)
                     .setPageSize(8)
                     .build()
-                return LivePagedListBuilder(localDataSource.getTvShows(queryAndFavorite), config).build()
+                return LivePagedListBuilder(localDataSource.getTvShows(query), config).build()
             }
 
             override fun shouldFetch(data: PagedList<TvShowsEntity>?): Boolean = data == null || data.isEmpty()
@@ -90,6 +99,15 @@ class MovieCatalogueRepository @Inject constructor(
                 localDataSource.insertTvShows(tvShows ?: listOf())
             }
         }.asLiveData()
+    }
+
+    override fun getFavoriteTvShowsWithQuery(query: String): LiveData<PagedList<TvShowsEntity>> {
+        val config = PagedList.Config.Builder()
+            .setEnablePlaceholders(false)
+            .setInitialLoadSizeHint(8)
+            .setPageSize(8)
+            .build()
+        return LivePagedListBuilder(localDataSource.getFavoriteTvShowsWithQuery(query), config).build()
     }
 
     override fun updateFavoriteTvShows(tvShow: TvShowsEntity) {

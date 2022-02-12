@@ -12,16 +12,18 @@ import javax.inject.Inject
 
 class LocalDataSource @Inject constructor(private val movieCatalogueDao: MovieCatalogueDao) {
 
-    fun getMovies(queryAndFavorite: Pair<String, Boolean>): DataSource.Factory<Int, MoviesEntity> = movieCatalogueDao.getMovies(FilterAndSearchUtils.getMovies(queryAndFavorite.first, queryAndFavorite.second))
+    fun getMovies(query: String): DataSource.Factory<Int, MoviesEntity> = movieCatalogueDao.getMovies(FilterAndSearchUtils.getMovies(query))
+    fun getFavoriteMoviesWithQuery(query: String): DataSource.Factory<Int, MoviesEntity> = movieCatalogueDao.getFavoriteMoviesWithQuery(FilterAndSearchUtils.getFavoriteMovies(query = query))
     fun getFavoriteMovies(): List<MoviesEntity> = movieCatalogueDao.getFavoriteMovies()
     fun insertMovies(movies: List<MoviesEntity>) = movieCatalogueDao.insertMoviesList(movies)
     fun updateMovies(movie: MoviesEntity) = movieCatalogueDao.updateMovies(movie)
-
     fun getMovie(id: Int): LiveData<MovieEntity> = movieCatalogueDao.getMovie(id)
-    fun insertMovie(movieEntity: MovieEntity) = movieCatalogueDao.insertMovie(movieEntity)
 
-    fun getTvShows(queryAndFavorite: Pair<String, Boolean>): DataSource.Factory<Int, TvShowsEntity> = movieCatalogueDao.getTvShows(FilterAndSearchUtils.getTvShows(queryAndFavorite.first, queryAndFavorite.second))
+    fun insertMovie(movieEntity: MovieEntity) = movieCatalogueDao.insertMovie(movieEntity)
+    fun getTvShows(query: String): DataSource.Factory<Int, TvShowsEntity> = movieCatalogueDao.getTvShows(FilterAndSearchUtils.getTvShows(query = query))
+
     fun getFavoriteTvShows(): List<TvShowsEntity> = movieCatalogueDao.getFavoriteTvShows()
+    fun getFavoriteTvShowsWithQuery(query: String): DataSource.Factory<Int, TvShowsEntity> = movieCatalogueDao.getFavoriteTvShowsWithQuery(FilterAndSearchUtils.getFavoriteTvShows(query = query))
     fun insertTvShows(tvShows: List<TvShowsEntity>) = movieCatalogueDao.insertTvShowsList(tvShows)
     fun updateTvShows(tvShow: TvShowsEntity) = movieCatalogueDao.updateTvShows(tvShow)
 

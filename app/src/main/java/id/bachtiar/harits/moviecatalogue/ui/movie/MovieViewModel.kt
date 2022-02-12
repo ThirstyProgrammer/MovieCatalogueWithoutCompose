@@ -14,8 +14,11 @@ class MovieViewModel @Inject constructor(
     private val repo: MovieCatalogueRepository
 ) : ViewModel() {
 
-    fun getPopularMovies(queryAndFavorite: Pair<String, Boolean>): LiveData<DataResult<PagedList<MoviesEntity>>> =
-        repo.getPopularMovies(queryAndFavorite =  queryAndFavorite)
+    fun getPopularMovies(query: String): LiveData<DataResult<PagedList<MoviesEntity>>> =
+        repo.getPopularMovies(query = query)
+
+    fun getFavoriteMovies(query: String): LiveData<PagedList<MoviesEntity>> =
+        repo.getFavoriteMoviesWithQuery(query)
 
     fun updateFavorite(movie: MoviesEntity) {
         repo.updateFavoriteMovie(movie)
