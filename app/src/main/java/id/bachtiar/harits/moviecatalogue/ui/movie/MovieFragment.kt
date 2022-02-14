@@ -6,14 +6,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import id.bachtiar.harits.moviecatalogue.R
-import id.bachtiar.harits.moviecatalogue.data.DataResult
 import id.bachtiar.harits.moviecatalogue.data.ViewState
 import id.bachtiar.harits.moviecatalogue.data.local.entity.MoviesEntity
 import id.bachtiar.harits.moviecatalogue.databinding.FragmentMovieBinding
@@ -26,10 +23,10 @@ import id.bachtiar.harits.moviecatalogue.util.handleViewState
 @AndroidEntryPoint
 class MovieFragment : Fragment(R.layout.fragment_movie), OnMovieClickCallback {
 
-    private lateinit var mAdapter: MovieAdapter
     private val binding: FragmentMovieBinding by viewBinding(FragmentMovieBinding::bind, R.id.container)
     private val mViewModel: MovieViewModel by viewModels()
     private val mSharedViewModel: MainViewModel by activityViewModels()
+    private var mAdapter: MovieAdapter? = null
 
     override fun onItemClicked(data: MoviesEntity?) {
         val direction = MainFragmentDirections.actionMainFragmentToDetailMovieFragment(data?.movieId ?: 0)
@@ -55,8 +52,6 @@ class MovieFragment : Fragment(R.layout.fragment_movie), OnMovieClickCallback {
     }
 
     private fun setupView() {
-        mAdapter = MovieAdapter()
-        mAdapter.setOnMovieClickCallback(this)
         binding.apply {
             val linearLayoutManager = LinearLayoutManager(requireContext())
             rvMovie.apply {
@@ -71,6 +66,8 @@ class MovieFragment : Fragment(R.layout.fragment_movie), OnMovieClickCallback {
 
     private fun handleViewModelObserver() {
         mSharedViewModel.queryAndFavorite.observe(viewLifecycleOwner) { queryAndFavorite ->
+            mAdapter = null
+            binding.rvMovie.adapter = null
             if (queryAndFavorite.second) {
                 mViewModel.getFavoriteMovies(queryAndFavorite.first).observe(viewLifecycleOwner) {
                     binding.viewState.handleViewState(
@@ -80,7 +77,9 @@ class MovieFragment : Fragment(R.layout.fragment_movie), OnMovieClickCallback {
                         isEmpty = it.isEmpty()
                     )
                     if (it != null) {
-                        mAdapter.submitList(it)
+                        mAdapter = MovieAdapter()
+                        mAdapter?.setOnMovieClickCallback(this)
+                        mAdapter?.submitList(it)
                         binding.rvMovie.adapter = mAdapter
                     }
                 }
@@ -88,7 +87,9 @@ class MovieFragment : Fragment(R.layout.fragment_movie), OnMovieClickCallback {
                 mViewModel.getPopularMovies(queryAndFavorite.first).observe(viewLifecycleOwner) {
                     binding.viewState.handleViewState(it.status, it.message.orEmpty())
                     if (it.data != null) {
-                        mAdapter.submitList(it.data)
+                        mAdapter = MovieAdapter()
+                        mAdapter?.setOnMovieClickCallback(this)
+                        mAdapter?.submitList(it.data)
                         binding.rvMovie.adapter = mAdapter
                     }
                 }

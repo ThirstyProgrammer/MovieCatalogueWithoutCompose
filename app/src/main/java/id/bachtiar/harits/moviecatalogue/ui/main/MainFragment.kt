@@ -3,12 +3,14 @@ package id.bachtiar.harits.moviecatalogue.ui.main
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import id.bachtiar.harits.moviecatalogue.ui.MainActivity
 import id.bachtiar.harits.moviecatalogue.R
 import id.bachtiar.harits.moviecatalogue.databinding.FragmentMainBinding
+import id.bachtiar.harits.moviecatalogue.ui.MainViewModel
 import id.bachtiar.harits.moviecatalogue.ui.movie.MovieFragment
 import id.bachtiar.harits.moviecatalogue.ui.tvshow.TvShowFragment
 import id.bachtiar.harits.moviecatalogue.util.ViewPagerAdapter
@@ -17,6 +19,7 @@ import id.bachtiar.harits.moviecatalogue.util.ViewPagerAdapter
 class MainFragment : Fragment(R.layout.fragment_main) {
 
     private val binding: FragmentMainBinding by viewBinding(FragmentMainBinding::bind, R.id.container)
+    private val mSharedViewModel: MainViewModel by activityViewModels()
     private val titlesViewPager: ArrayList<String> = arrayListOf()
     private val fragmentsViewPager: ArrayList<Fragment> = arrayListOf()
 
@@ -25,6 +28,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         (requireActivity() as MainActivity).showMenu()
         requireActivity().title = getString(R.string.app_name)
         setupViewPager()
+        handleViewModelObserver()
     }
 
     private fun setupViewPager() {
@@ -46,6 +50,16 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             TabLayoutMediator(tabLayout, viewPager) { tab, position ->
                 tab.text = titlesViewPager[position]
             }.attach()
+        }
+    }
+
+    private fun handleViewModelObserver() {
+        mSharedViewModel.queryAndFavorite.observe(viewLifecycleOwner) { queryAndFavorite ->
+            if (queryAndFavorite.second) {
+                requireActivity().title = getString(R.string.favorite)
+            }else{
+                requireActivity().title = getString(R.string.app_name)
+            }
         }
     }
 }

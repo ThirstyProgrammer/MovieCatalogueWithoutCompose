@@ -68,6 +68,7 @@ class MainActivityTest {
     fun checkTabTVShowJourney() {
         onView(withId(R.id.view_pager))
             .perform(swipeLeft())
+        onView(isRoot()).perform(waitFor(500L))
         onView(withId(R.id.rv_tv_show))
             .check(matches(isDisplayed()))
             .perform(scrollTo<TvShowViewHolder>(hasDescendant(withText("Peaky Blinders"))))

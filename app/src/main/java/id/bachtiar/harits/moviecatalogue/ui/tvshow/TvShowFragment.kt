@@ -23,10 +23,10 @@ import id.bachtiar.harits.moviecatalogue.util.handleViewState
 @AndroidEntryPoint
 class TvShowFragment : Fragment(R.layout.fragment_tv_show), OnTvShowClickCallback {
 
-    private lateinit var mAdapter : TvShowAdapter
     private val binding: FragmentTvShowBinding by viewBinding(FragmentTvShowBinding::bind, R.id.container)
     private val mViewModel: TvShowViewModel by viewModels()
     private val mSharedViewModel: MainViewModel by activityViewModels()
+    private var mAdapter : TvShowAdapter? = null
 
     override fun onItemClicked(data: TvShowsEntity?) {
         val direction = MainFragmentDirections.actionMainFragmentToDetailTvShowFragment(data?.tvShowId ?: 0)
@@ -51,8 +51,23 @@ class TvShowFragment : Fragment(R.layout.fragment_tv_show), OnTvShowClickCallbac
         handleViewModelObserver()
     }
 
+    private fun setupView() {
+        binding.apply {
+            val linearLayoutManager = LinearLayoutManager(requireContext())
+            rvTvShow.apply {
+                setHasFixedSize(true)
+                layoutManager = linearLayoutManager
+                if (itemDecorationCount == 0) {
+                    addItemDecoration(PaddingItemDecoration(ViewUtil.dpToPx(16)))
+                }
+            }
+        }
+    }
+
     private fun handleViewModelObserver() {
         mSharedViewModel.queryAndFavorite.observe(viewLifecycleOwner) { queryAndFavorite ->
+            mAdapter = null
+            binding.rvTvShow.adapter = null
             if (queryAndFavorite.second) {
                 mViewModel.getFavoriteTvShows(queryAndFavorite.first).observe(viewLifecycleOwner) {
                     binding.viewState.handleViewState(
@@ -62,7 +77,9 @@ class TvShowFragment : Fragment(R.layout.fragment_tv_show), OnTvShowClickCallbac
                         isEmpty = it.isEmpty()
                     )
                     if (it != null) {
-                        mAdapter.submitList(it)
+                        mAdapter = TvShowAdapter()
+                        mAdapter?.setOnMovieClickCallback(this)
+                        mAdapter?.submitList(it)
                         binding.rvTvShow.adapter = mAdapter
                     }
                 }
@@ -71,23 +88,10 @@ class TvShowFragment : Fragment(R.layout.fragment_tv_show), OnTvShowClickCallbac
                     binding.viewState.handleViewState(it.status, it.message.orEmpty())
                     if (it.data != null) {
                         mAdapter = TvShowAdapter()
-                        mAdapter.submitList(it.data)
-                        mAdapter.setOnMovieClickCallback(this)
+                        mAdapter?.setOnMovieClickCallback(this)
+                        mAdapter?.submitList(it.data)
                         binding.rvTvShow.adapter = mAdapter
                     }
-                }
-            }
-        }
-    }
-
-    private fun setupView() {
-        binding.apply {
-            val linearLayoutManager = LinearLayoutManager(requireContext())
-            rvTvShow.apply {
-                setHasFixedSize(true)
-                layoutManager = linearLayoutManager
-                if (itemDecorationCount == 0) {
-                    addItemDecoration(PaddingItemDecoration(ViewUtil.dpToPx(16)))
                 }
             }
         }
